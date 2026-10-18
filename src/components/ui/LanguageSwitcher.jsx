@@ -111,7 +111,7 @@ export default function LanguageSwitcher({ isMobile = false }) {
             {isActive && (
               <motion.div
                 layoutId={isMobile ? "activeLanguagePillMobile" : "activeLanguagePillDesktop"}
-                className="absolute inset-0 rounded-full bg-white/10 border border-signal/40 shadow-[0_0_12px_rgba(232,255,71,0.15)]"
+                className="absolute inset-0 rounded-full bg-white/10 border border-signal/40 shadow-[0_0_12px_rgba(209,255,43,0.15)]"
                 transition={{ type: 'spring', stiffness: 450, damping: 30 }}
               />
             )}

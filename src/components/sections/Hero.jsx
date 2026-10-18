@@ -104,7 +104,7 @@ export default function Hero() {
           className="flex flex-wrap items-center gap-6"
         >
           <a href="#work">
-            <MagneticButton className="bg-signal text-ink-950 font-display font-medium px-8 py-4 rounded-full text-lg hover:shadow-[0_0_30px_rgba(232,255,71,0.3)] transition-all">
+            <MagneticButton className="bg-signal text-ink-950 font-display font-medium px-8 py-4 rounded-full text-lg hover:shadow-[0_0_30px_rgba(209,255,43,0.3)] transition-all">
               {t.hero.seeWork}
             </MagneticButton>
           </a>

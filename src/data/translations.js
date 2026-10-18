@@ -105,10 +105,10 @@ export const translations = {
       badge: 'Os Humanos por Trás dos Pixels',
       title: 'Nossa equipe principal.',
       members: [
-        { name: 'Ritik Singh', role: 'Fundador & Estratégia', quote: 'Boa estratégia é apenas pensamento claro tornado visível.', colors: ['#e8ff47', '#080812'] },
-        { name: 'Deepak Kanojiya', role: 'Diretor Criativo', quote: 'Design que não resolve um problema real é apenas decoração.', colors: ['#ff6b35', '#080812'] },
-        { name: 'Mayank Somvanshi', role: 'Engenheiro Líder', quote: 'Código é arte em movimento. Entregue com maestria.', colors: ['#a78bfa', '#080812'] },
-        { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Crescimento consistente é um sistema, não um truque passageiro.', colors: ['#34d399', '#080812'] },
+        { name: 'Ritik Singh', role: 'Fundador & Estratégia', quote: 'Boa estratégia é apenas pensamento claro tornado visível.', colors: ['#d1ff2b', '#0a0a0a'] },
+        { name: 'Deepak Kanojiya', role: 'Diretor Criativo', quote: 'Design que não resolve um problema real é apenas decoração.', colors: ['#fe4602', '#0a0a0a'] },
+        { name: 'Mayank Somvanshi', role: 'Engenheiro Líder', quote: 'Código é arte em movimento. Entregue com maestria.', colors: ['#a78bfa', '#0a0a0a'] },
+        { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Crescimento consistente é um sistema, não um truque passageiro.', colors: ['#34d399', '#0a0a0a'] },
       ]
     },
     testimonials: {
@@ -138,7 +138,7 @@ export const translations = {
           features: ['Identidade Visual', 'Website de 5 páginas', 'Design Responsivo', 'Configuração Inicial de SEO', '3 meses de suporte'],
           timeline: '3 semanas',
           btnText: 'Começar Agora',
-          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(232,255,71,0.2)]',
+          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(209,255,43,0.2)]',
           borderClass: 'border-white/10'
         },
         {
@@ -148,7 +148,7 @@ export const translations = {
           features: ['Design System completo', 'Aplicação Web sob medida', 'Animações fluidas', 'SEO Técnico avançado', 'Integração de Analytics', '6 meses de suporte'],
           timeline: '6 semanas',
           btnText: 'Começar Agora',
-          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(232,255,71,0.2)]',
+          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(209,255,43,0.2)]',
           borderClass: 'border-signal/50',
           popular: true
         },
@@ -320,10 +320,10 @@ export const translations = {
       badge: 'The Humans Behind The Pixels',
       title: 'Our core team.',
       members: [
-        { name: 'Ritik Singh', role: 'Founder & Strategy', quote: 'Good strategy is just clear thinking made visible.', colors: ['#e8ff47', '#080812'] },
-        { name: 'Deepak Kanojiya', role: 'Creative Director', quote: 'Design that doesn\'t solve a problem is just decoration.', colors: ['#ff6b35', '#080812'] },
-        { name: 'Mayank Somvanshi', role: 'Lead Engineer', quote: 'Code is poetry. Ship it like it is.', colors: ['#a78bfa', '#080812'] },
-        { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Growth is a system, not a hack.', colors: ['#34d399', '#080812'] },
+        { name: 'Ritik Singh', role: 'Founder & Strategy', quote: 'Good strategy is just clear thinking made visible.', colors: ['#d1ff2b', '#0a0a0a'] },
+        { name: 'Deepak Kanojiya', role: 'Creative Director', quote: 'Design that doesn\'t solve a problem is just decoration.', colors: ['#fe4602', '#0a0a0a'] },
+        { name: 'Mayank Somvanshi', role: 'Lead Engineer', quote: 'Code is poetry. Ship it like it is.', colors: ['#a78bfa', '#0a0a0a'] },
+        { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Growth is a system, not a hack.', colors: ['#34d399', '#0a0a0a'] },
       ]
     },
     testimonials: {
@@ -353,7 +353,7 @@ export const translations = {
           features: ['Brand Identity', '5-page website', 'Responsive Design', 'Basic SEO Setup', '3 months support'],
           timeline: '3 weeks',
           btnText: 'Get Started',
-          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(232,255,71,0.2)]',
+          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(209,255,43,0.2)]',
           borderClass: 'border-white/10'
         },
         {
@@ -363,7 +363,7 @@ export const translations = {
           features: ['Full design system', 'Custom Web App', 'Advanced Animations', 'Technical SEO', 'Analytics Integration', '6 months support'],
           timeline: '6 weeks',
           btnText: 'Get Started',
-          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(232,255,71,0.2)]',
+          btnClass: 'bg-signal text-ink-950 hover:shadow-[0_0_20px_rgba(209,255,43,0.2)]',
           borderClass: 'border-signal/50',
           popular: true
         },

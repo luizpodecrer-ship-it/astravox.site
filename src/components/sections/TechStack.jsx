@@ -29,7 +29,7 @@ export default function TechStack() {
                 {category.items.map((tech) => (
                   <motion.div
                     key={tech}
-                    whileHover={{ scale: 1.05, backgroundColor: '#e8ff47', color: '#04040a', borderColor: '#e8ff47' }}
+                    whileHover={{ scale: 1.05, backgroundColor: '#d1ff2b', color: '#0a0a0a', borderColor: '#d1ff2b' }}
                     className="font-mono text-xs md:text-sm px-4 py-2 rounded-full border border-white/10 text-mist-500 cursor-default transition-colors"
                   >
                     {tech}

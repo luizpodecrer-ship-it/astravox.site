@@ -17,10 +17,10 @@ export const caseStudies = [
 ]
 
 export const team = [
-  { name: 'Ritik Singh', role: 'Founder & Strategy', quote: 'Good strategy is just clear thinking made visible.', colors: ['#e8ff47', '#080812'] },
-  { name: 'Deepak Kanojiya', role: 'Creative Director', quote: 'Design that doesn\'t solve a problem is just decoration.', colors: ['#ff6b35', '#080812'] },
-  { name: 'Mayank Somvanshi', role: 'Lead Engineer', quote: 'Code is poetry. Ship it like it is.', colors: ['#a78bfa', '#080812'] },
-  { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Growth is a system, not a hack.', colors: ['#34d399', '#080812'] },
+  { name: 'Ritik Singh', role: 'Founder & Strategy', quote: 'Good strategy is just clear thinking made visible.', colors: ['#d1ff2b', '#0a0a0a'] },
+  { name: 'Deepak Kanojiya', role: 'Creative Director', quote: 'Design that doesn\'t solve a problem is just decoration.', colors: ['#fe4602', '#0a0a0a'] },
+  { name: 'Mayank Somvanshi', role: 'Lead Engineer', quote: 'Code is poetry. Ship it like it is.', colors: ['#a78bfa', '#0a0a0a'] },
+  { name: 'Nand Kishore Soni', role: 'Growth & Marketing', quote: 'Growth is a system, not a hack.', colors: ['#34d399', '#0a0a0a'] },
 ]
 
 export const faqs = [

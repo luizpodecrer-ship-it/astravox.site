@@ -6,19 +6,19 @@ export default {
     extend: {
       colors: {
         ink: {
-          950: '#04040a',
-          900: '#080812',
-          800: '#0d0d1f',
-          700: '#12122e',
-          600: '#1a1a3e',
+          950: '#0a0a0a',       // new black
+          900: '#121212',
+          800: '#1a1a1a',
+          700: '#242424',
+          600: '#2e2e2e',
         },
         signal: {
-          DEFAULT: '#e8ff47',   // electric lime — primary accent
-          dim: '#b8cc38',
+          DEFAULT: '#d1ff2b',   // new electric lime / lemon yellow
+          dim: '#b5e022',
         },
         ember: {
-          DEFAULT: '#ff6b35',   // warm orange — secondary accent
-          dim: '#cc5529',
+          DEFAULT: '#fe4602',   // new orange
+          dim: '#d63a00',
         },
         mist: {
           900: '#9898b8',
@@ -28,9 +28,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['var(--heading-font)', '"Sora"', '"Clash Display"', 'sans-serif'],
-        body: ['var(--body-font)', '"Public Sans"', '"Cabinet Grotesk"', 'sans-serif'],
-        heading: ['var(--heading-font)', '"Sora"', 'sans-serif'],
+        display: ['var(--heading-font)', '"Outfit"', 'sans-serif'],
+        body: ['var(--body-font)', '"PT Sans"', 'sans-serif'],
+        heading: ['var(--heading-font)', '"Outfit"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       fontSize: {
