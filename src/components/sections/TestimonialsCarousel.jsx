@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, ChevronLeft } from 'lucide-react'
 import MagneticButton from '../ui/MagneticButton'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function TestimonialsCarousel() {
-  const testimonials = [
-    { quote: "NEXUS transformed our entire digital presence. We went from embarrassed to proud in 12 weeks.", author: "CEO", company: "Vanta Finance" },
-    { quote: "The strategy session alone was worth the entire engagement cost.", author: "Founder", company: "Bloom Health" },
-    { quote: "They think like founders, not vendors. Rare.", author: "CTO", company: "Orbit SaaS" },
-    { quote: "Delivered 3 weeks early. Never happens with agencies.", author: "Product Lead", company: "Crest Retail" },
-    { quote: "Our Clutch review says 5 stars. Honestly, we'd give 6.", author: "CMO", company: "Frameshift" }
-  ]
+  const { t } = useLanguage()
+  const testimonials = t.testimonials.list
 
   const [currentIndex, setCurrentIndex] = useState(0)
 

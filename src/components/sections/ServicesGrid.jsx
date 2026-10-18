@@ -1,16 +1,21 @@
 import { motion } from 'framer-motion'
 import * as LucideIcons from 'lucide-react'
-import { services } from '../../data/content'
 import ScrollReveal from '../ui/ScrollReveal'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function ServicesGrid() {
+  const { t } = useLanguage()
+  const services = t.services.list
+
   return (
     <section className="bg-ink-900 py-32 relative" id="services">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
         <ScrollReveal delay={0.1}>
-          <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">Our Capabilities</p>
-          <h2 className="font-display text-5xl md:text-7xl font-bold mb-16 tracking-tight">Everything you need.<br/>Nothing you don't.</h2>
+          <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">{t.services.badge}</p>
+          <h2 className="font-display text-5xl md:text-7xl font-bold mb-16 tracking-tight whitespace-pre-line">
+            {t.services.title}
+          </h2>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[minmax(280px,auto)]">
@@ -57,7 +62,7 @@ export default function ServicesGrid() {
 
                 {/* Hover arrow slide-in */}
                 <div className="absolute right-8 bottom-8 flex items-center gap-2 text-signal font-mono text-sm translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
-                  <span className="hidden sm:inline">Explore</span> &rarr;
+                  <span className="hidden sm:inline">{t.services.explore}</span> &rarr;
                 </div>
               </motion.div>
             )

@@ -28,8 +28,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Clash Display"', 'sans-serif'],
-        body: ['"Cabinet Grotesk"', 'sans-serif'],
+        display: ['var(--heading-font)', '"Sora"', '"Clash Display"', 'sans-serif'],
+        body: ['var(--body-font)', '"Public Sans"', '"Cabinet Grotesk"', 'sans-serif'],
+        heading: ['var(--heading-font)', '"Sora"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       fontSize: {

@@ -1,17 +1,25 @@
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&family=sora:wght@400;700&family=public:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Variables */
+:root {
+  --heading-font: 'Sora', 'sora', sans-serif;
+  --body-font: 'Public Sans', 'public', sans-serif;
+}
+
+/* Font Classes */
+.heading {
+  font-family: var(--heading-font);
+}
+.body-text {
+  font-family: var(--body-font);
+}
+
 @layer base {
-  :root {
-    --cursor-x: 0px;
-    --cursor-y: 0px;
-  }
-
-  * {
-    cursor: none !important;
-  }
-
   html {
     scroll-behavior: smooth;
   }

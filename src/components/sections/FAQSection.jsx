@@ -2,11 +2,13 @@ import * as Accordion from '@radix-ui/react-accordion'
 import { Plus, Minus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { faqs } from '../../data/content'
 import ScrollReveal from '../ui/ScrollReveal'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function FAQSection() {
   const [value, setValue] = useState('')
+  const { t } = useLanguage()
+  const faqs = t.faq.list
 
   return (
     <section className="bg-ink-950 py-32 border-b border-white/5" id="faq">
@@ -19,10 +21,10 @@ export default function FAQSection() {
                 FAQ
               </h2>
               <div className="relative -mt-16 md:-mt-20 ml-2">
-                <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">The details</p>
-                <h3 className="font-display text-4xl md:text-5xl font-bold mb-6">Answers to your questions.</h3>
+                <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">{t.faq.badge}</p>
+                <h3 className="font-display text-4xl md:text-5xl font-bold mb-6">{t.faq.title}</h3>
                 <p className="text-mist-900 font-body text-lg leading-relaxed max-w-sm">
-                  Everything you need to know about how we work, what we charge, and what happens when things go wrong.
+                  {t.faq.subtitle}
                 </p>
               </div>
             </div>

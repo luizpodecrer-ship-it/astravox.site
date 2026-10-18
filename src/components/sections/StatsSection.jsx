@@ -1,15 +1,10 @@
 import AnimatedCounter from '../ui/AnimatedCounter'
 import ScrollReveal from '../ui/ScrollReveal'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function StatsSection() {
-  const stats = [
-    { num: 48, label: 'Projects Delivered', suffix: '+' },
-    { num: 12, label: 'Revenue Generated', prefix: '$', suffix: 'M' },
-    { num: 98, label: 'Satisfaction Rate', suffix: '%' },
-    { num: 4.9, label: 'Avg Clutch Rating', suffix: '★', decimals: 1 },
-    { num: 6, label: 'Years in Business' },
-    { num: 3, label: 'Countries Served' }
-  ]
+  const { t } = useLanguage()
+  const stats = t.stats.list
 
   return (
     <section className="bg-signal py-24 md:py-32 w-full text-ink-950 relative z-10">

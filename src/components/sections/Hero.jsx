@@ -3,10 +3,12 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import MagneticButton from '../ui/MagneticButton'
 import AnimatedCounter from '../ui/AnimatedCounter'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function Hero() {
   const containerRef = useRef(null)
   const blobRef = useRef(null)
+  const { t, language } = useLanguage()
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -27,9 +29,9 @@ export default function Hero() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  const line1 = "We build".split(' ')
-  const line2 = "digital futures".split(' ')
-  const line3 = "that matter.".split(' ')
+  const line1 = t.hero.line1.split(' ')
+  const line2 = t.hero.line2.split(' ')
+  const line3 = t.hero.line3.split(' ')
   
   let wordIndex = 0
 
@@ -38,7 +40,7 @@ export default function Hero() {
       const currentDelay = (wordIndex++) * 0.08
       return (
         <motion.span
-          key={i}
+          key={`${language}-${i}-${word}`}
           initial={{ opacity: 0, y: 60, rotateX: -40 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
           transition={{ delay: currentDelay, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -66,45 +68,49 @@ export default function Hero() {
         
         {/* Top Badge */}
         <motion.div
+          key={`badge-${language}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="bg-ink-800 border border-white/10 text-mist-900 font-mono text-xs px-4 py-2 rounded-full mb-12 flex items-center gap-2"
         >
           <div className="w-1.5 h-1.5 bg-signal rounded-full animate-pulse-slow"></div>
-          Available for projects in 2025 &rarr;
+          {t.hero.badge}
         </motion.div>
 
         {/* Headlines */}
-        <h1 className="font-display text-7xl sm:text-8xl md:text-[8rem] lg:text-[10rem] leading-[0.9] tracking-tight mb-8 w-full perspective-1000" data-cursor="hover">
+        <h1 key={`headline-${language}`} className="font-display text-7xl sm:text-8xl md:text-[8rem] lg:text-[10rem] leading-[0.9] tracking-tight mb-8 w-full perspective-1000" data-cursor="hover">
           <div className="overflow-visible pb-1 sm:pb-2">{renderWords(line1)}</div>
           <div className="overflow-visible pb-1 sm:pb-2">{renderWords(line2, true)}</div>
           <div className="overflow-visible pb-1 sm:pb-2">{renderWords(line3)}</div>
         </h1>
 
         <motion.p
+          key={`p-${language}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 1 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
           className="font-body text-mist-900 text-lg md:text-xl max-w-lg mb-12 leading-relaxed"
           data-cursor="text"
         >
-          We are an award-winning studio pushing the boundaries of strategy, design, and engineering to build digital products people love.
+          {t.hero.subtitle}
         </motion.p>
 
         {/* Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
           className="flex flex-wrap items-center gap-6"
         >
-          <MagneticButton className="bg-signal text-ink-950 font-display font-medium px-8 py-4 rounded-full text-lg hover:shadow-[0_0_30px_rgba(232,255,71,0.3)] transition-all">
-            See Our Work
-          </MagneticButton>
-          <button className="border border-white/20 text-mist-900 hover:text-white hover:border-white/40 hover:bg-white/5 font-display font-medium px-8 py-4 rounded-full text-lg transition-all" data-cursor="hover">
-            How We Work
-          </button>
+          <a href="#work">
+            <MagneticButton className="bg-signal text-ink-950 font-display font-medium px-8 py-4 rounded-full text-lg hover:shadow-[0_0_30px_rgba(232,255,71,0.3)] transition-all">
+              {t.hero.seeWork}
+            </MagneticButton>
+          </a>
+          <a href="#process" className="border border-white/20 text-mist-900 hover:text-white hover:border-white/40 hover:bg-white/5 font-display font-medium px-8 py-4 rounded-full text-lg transition-all" data-cursor="hover">
+            {t.hero.howWeWork}
+          </a>
         </motion.div>
 
       </motion.div>
@@ -118,7 +124,7 @@ export default function Hero() {
         <svg viewBox="0 0 100 100" width="100" height="100">
           <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
           <text className="font-mono text-[9.5px] fill-white tracking-widest uppercase">
-            <textPath href="#circlePath">Premium · Studio · 2025 · Premium · Studio · 2025 · </textPath>
+            <textPath href="#circlePath">{t.hero.stamp}</textPath>
           </text>
         </svg>
       </motion.div>
@@ -126,7 +132,7 @@ export default function Hero() {
       <div className="absolute bottom-8 left-6 md:left-12 z-20 hidden sm:block">
         <div className="font-display flex flex-col gap-1 items-start text-white/80">
           <span className="text-3xl text-signal"><AnimatedCounter end={48} suffix="+" /></span>
-          <span className="font-mono text-xs text-mist-900 tracking-wider">Projects Delivered</span>
+          <span className="font-mono text-xs text-mist-900 tracking-wider">{t.hero.projectsDelivered}</span>
         </div>
       </div>
 

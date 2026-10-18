@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import ScrollReveal from '../ui/ScrollReveal'
+import { useLanguage } from '../../hooks/useLanguage'
 
 export default function TechStack() {
+  const { t } = useLanguage()
   const stack = [
     { cat: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Framer Motion', 'Three.js'] },
     { cat: 'Backend', items: ['Node.js', 'Python', 'FastAPI', 'PostgreSQL', 'Redis'] },
@@ -14,7 +16,7 @@ export default function TechStack() {
     <section className="bg-ink-900 py-32 border-t border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <ScrollReveal className="mb-20">
-          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Our Arsenal.</h2>
+          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">{t.techStack.title}</h2>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-8">

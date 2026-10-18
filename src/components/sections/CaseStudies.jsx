@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { caseStudies } from '../../data/content'
 import ScrollReveal from '../ui/ScrollReveal'
+import { useLanguage } from '../../hooks/useLanguage'
 
-const CaseStudyCard = ({ data }) => {
+const CaseStudyCard = ({ data, viewCaseText }) => {
   const cardRef = useRef(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -77,7 +77,7 @@ const CaseStudyCard = ({ data }) => {
           </div>
 
           <div className="mt-auto flex items-center gap-2 text-signal font-mono text-sm group/btn cursor-pointer">
-            <span className="group-hover/btn:underline hover:underline-offset-4">View Case Study</span> &rarr;
+            <span className="group-hover/btn:underline hover:underline-offset-4">{viewCaseText}</span> &rarr;
           </div>
         </div>
       </motion.div>
@@ -86,23 +86,26 @@ const CaseStudyCard = ({ data }) => {
 }
 
 export default function CaseStudies() {
+  const { t } = useLanguage()
+  const caseStudies = t.caseStudies.list
+
   return (
     <section className="bg-ink-950 py-32" id="work">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <ScrollReveal className="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
-            <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">Selected Work</p>
-            <h2 className="font-display text-5xl md:text-7xl font-bold tracking-tight">Proof in production.</h2>
+            <p className="font-mono text-xs text-signal uppercase tracking-widest mb-4">{t.caseStudies.badge}</p>
+            <h2 className="font-display text-5xl md:text-7xl font-bold tracking-tight">{t.caseStudies.title}</h2>
           </div>
           <button className="text-mist-900 border border-white/10 hover:border-white/30 hover:text-white px-6 py-3 rounded-full text-sm transition-colors text-nowrap self-start md:self-auto" data-cursor="hover">
-            View All Projects
+            {t.caseStudies.viewAll}
           </button>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           {caseStudies.map((cs, i) => (
             <ScrollReveal key={cs.id} delay={i * 0.1}>
-              <CaseStudyCard data={cs} />
+              <CaseStudyCard data={cs} viewCaseText={t.caseStudies.viewCase} />
             </ScrollReveal>
           ))}
         </div>

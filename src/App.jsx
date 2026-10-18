@@ -1,8 +1,8 @@
 import { MotionConfig } from 'framer-motion'
+import { LanguageProvider } from './context/LanguageProvider'
 
-import CustomCursor from './components/ui/CustomCursor'
 import ScrollProgressBar from './components/ui/ScrollProgressBar'
-import Navbar from './components/layout/Navbar'
+import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
 import LogoCloud from './components/sections/LogoCloud'
@@ -21,11 +21,11 @@ import CTASection from './components/sections/CTASection'
 
 export default function App() {
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="relative bg-ink-950 font-body text-mist-100 overflow-x-hidden selection:bg-signal selection:text-ink-950">
-        <CustomCursor />
-        <ScrollProgressBar />
-        <Navbar />
+    <LanguageProvider>
+      <MotionConfig reducedMotion="user">
+        <div className="relative bg-ink-950 font-body text-mist-100 overflow-x-hidden selection:bg-signal selection:text-ink-950">
+          <ScrollProgressBar />
+          <Header />
         
         <main>
           <Hero />
@@ -45,7 +45,8 @@ export default function App() {
         </main>
         
         <Footer />
-      </div>
-    </MotionConfig>
+        </div>
+      </MotionConfig>
+    </LanguageProvider>
   )
 }
