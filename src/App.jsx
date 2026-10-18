@@ -20,8 +20,6 @@ import BlogPreview from './components/sections/BlogPreview'
 import CTASection from './components/sections/CTASection'
 
 export default function App() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative bg-ink-950 font-body text-mist-100 overflow-x-hidden selection:bg-signal selection:text-ink-950">

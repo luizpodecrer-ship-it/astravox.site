@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import MagneticButton from '../ui/MagneticButton'
 import { Menu, X, Camera as Instagram, Briefcase as Linkedin, MessageCircle as Twitter, Palette as Dribbble } from 'lucide-react'

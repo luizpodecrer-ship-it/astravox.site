@@ -18,7 +18,7 @@ export default function TechStack() {
         </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-8">
-          {stack.map((category, i) => (
+          {stack.map((category) => (
             <div key={category.cat} className="flex flex-col">
               <h3 className="font-mono text-xs text-signal uppercase tracking-widest mb-6 border-b border-white/5 pb-4">
                 {category.cat}
