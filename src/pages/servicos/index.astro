@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Mock from '../../components/Mock.astro';
+import CTA from '../../components/CTA.astro';
+import { SERVICES, SITE } from '../../data/site';
+const kinds = ['site', 'phone', 'dash', 'chat', 'ux', 'brand'] as const;
+const hues = [72, 150, 190, 85, 120, 170];
+const schema = [{
+  '@type': 'ItemList',
+  itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE.url}/servicos/${s.slug}/`, name: s.name })),
+}];
+---
+<Base title="Serviços: Sites, Apps, SaaS e IA | Astravox" description="Conheça os serviços da Astravox: criação de sites, desenvolvimento de aplicativos, plataformas SaaS, soluções com IA, UX/UI design e branding." schema={schema} headerVariant="light" breadcrumb={[{ name: 'Serviços', path: '/servicos/' }]}>
+  <section class="page-hero">
+    <div class="wrap">
+      <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Serviços</li></ol>
+      <span class="tag">Serviços</span>
+      <h1 class="display" data-split>Tudo o que seu<br />produto precisa.</h1>
+      <p class="lead" data-reveal>Estratégia, design, desenvolvimento e inteligência artificial com um só time. Escolha uma frente ou combine várias.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap work">
+      {SERVICES.map((s, i) => (
+        <a class="work-card" href={`/servicos/${s.slug}/`} data-reveal style={`--d:${(i % 2) * 0.1}s`}>
+          <div class="work-card__media"><span class="tag tag--light">0{i + 1}</span><div class="work-card__art"><Mock kind={kinds[i]} hue={hues[i]} /></div></div>
+          <div class="work-card__meta">
+            <div><h2 class="h3">{s.name}</h2><p>{s.short}</p></div>
+            <span class="card__icon" style="flex:none"><Icon name="arrow" /></span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+  <CTA />
+</Base>

@@ -1,0 +1,31 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { NAV, SITE, whatsappLink } from '../data/site';
+interface Props { variant?: 'dark' | 'light' }
+const { variant = 'dark' } = Astro.props;
+const path = Astro.url.pathname;
+---
+<header class:list={['header', variant === 'light' && 'header--light']} id="header">
+  <nav class="nav" aria-label="Principal">
+    <a href="/" class="logo" aria-label={`${SITE.name} — página inicial`}><Logo /><span class="sr-only">{SITE.name}</span></a>
+    <div class="nav__links">
+      {NAV.map((l) => <a href={l.href} aria-current={path.startsWith(l.href) ? 'page' : undefined}>{l.label}</a>)}
+    </div>
+    <div class="nav__right">
+      <span class="nav__progress" id="progress" aria-hidden="true">0%</span>
+      <a class="btn nav__cta-desktop" href="/contato/">Fale conosco</a>
+      <button class="nav__toggle" id="menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu"><span></span></button>
+    </div>
+  </nav>
+</header>
+<div class="mobile-menu" id="mobile-menu" inert>
+  <ul role="list">
+    <li><a href="/">Início</a></li>
+    {NAV.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+  </ul>
+  <div class="mm-foot">
+    <a class="btn btn--accent btn--block" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
+    <a class="btn btn--ghost-dark btn--block" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import Orbit from '../components/Orbit.astro';
+---
+<Base title="Página não encontrada | Astravox" description="Esta página não existe ou mudou de endereço." noindex>
+  <div class="hero-shell">
+    <section class="hero" style="justify-content:center;text-align:center;align-items:center">
+      <Orbit />
+      <span class="tag tag--dark">Erro 404</span>
+      <h1 class="display" style="margin-top:24px">Perdido no espaço.</h1>
+      <p class="hero__sub">Esta página não existe ou mudou de endereço.</p>
+      <div class="hero__ctas" style="margin-top:30px;justify-content:center"><a class="btn btn--light" href="/">Voltar ao início</a><a class="btn btn--ghost-dark" href="/servicos/">Ver serviços</a></div>
+    </section>
+  </div>
+</Base>

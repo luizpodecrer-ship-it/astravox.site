@@ -1,0 +1,11 @@
+---
+// Logo oficial: símbolo lima + palavra "astravox" na cor do texto (preto no claro, branco no escuro).
+import { SYMBOL_PATH, WORD_PATH, LIME } from '../data/logo';
+interface Props { class?: string; variant?: 'full' | 'symbol' | 'word' }
+const { class: cls, variant = 'full' } = Astro.props;
+const viewBox = variant === 'symbol' ? '0 0 166 200' : variant === 'word' ? '198 28 703 114' : '0 0 900 200';
+---
+<svg class:list={['brand', `brand--${variant}`, cls]} viewBox={viewBox} aria-hidden="true" focusable="false">
+  {variant !== 'word' && <path fill={LIME} fill-rule="evenodd" d={SYMBOL_PATH} />}
+  {variant !== 'symbol' && <path fill="currentColor" fill-rule="evenodd" d={WORD_PATH} />}
+</svg>

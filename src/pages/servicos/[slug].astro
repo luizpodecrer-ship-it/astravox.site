@@ -1,0 +1,93 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Mock from '../../components/Mock.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTA from '../../components/CTA.astro';
+import { SERVICES, SITE, whatsappLink, type Service } from '../../data/site';
+
+export function getStaticPaths() {
+  const kinds = ['site', 'phone', 'dash', 'chat', 'ux', 'brand'];
+  const hues = [72, 150, 190, 85, 120, 170];
+  return SERVICES.map((s, i) => ({ params: { slug: s.slug }, props: { s, kind: kinds[i], hue: hues[i] } }));
+}
+const { s, kind, hue } = Astro.props as { s: Service; kind: any; hue: number };
+const others = SERVICES.filter((o) => o.slug !== s.slug);
+const url = `${SITE.url}/servicos/${s.slug}/`;
+const schema = [
+  {
+    '@type': 'Service',
+    '@id': `${url}#service`,
+    name: s.name,
+    serviceType: s.name,
+    description: s.intro,
+    url,
+    provider: { '@id': `${SITE.url}/#org` },
+    areaServed: SITE.areaServed.map((a) => ({ '@type': 'Country', name: a })),
+    hasOfferCatalog: { '@type': 'OfferCatalog', name: `Entregas — ${s.name}`, itemListElement: s.deliverables.map((d) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: d } })) },
+  },
+  { '@type': 'FAQPage', mainEntity: s.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title={s.title} description={s.metaDescription} schema={schema} headerVariant="light" breadcrumb={[{ name: 'Serviços', path: '/servicos/' }, { name: s.name, path: `/servicos/${s.slug}/` }]}>
+  <section class="page-hero">
+    <div class="wrap">
+      <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li><a href="/servicos/">Serviços</a></li><li>{s.name}</li></ol>
+      <span class="tag">{s.tags.join(' · ')}</span>
+      <h1 class="display" style="font-size:clamp(44px,6vw,88px)" data-reveal>{s.name}</h1>
+      <p class="lead" data-reveal style="--d:.1s">{s.intro}</p>
+      <div class="hero__ctas" style="margin-top:34px" data-reveal>
+        <a class="btn btn--accent" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
+        <a class="btn btn--ghost" href={whatsappLink(`Olá! Quero saber mais sobre ${s.name}.`)} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="shot" style="aspect-ratio:21/9;border-radius:var(--radius)" data-reveal><Mock kind={kind} hue={hue} /></div>
+  </div>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div>
+        <span class="tag" data-reveal>O que entregamos</span>
+        <h2 class="h2" style="margin-top:22px" data-reveal>Tudo incluído,<br />do início ao fim.</h2>
+      </div>
+      <ul class="list-check" role="list">
+        {s.deliverables.map((d, i) => <li data-reveal style={`--d:${i * 0.05}s`}><span class="check"><Icon name="check" /></span>{d}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="soft-shell">
+    <div class="soft section">
+      <div class="wrap two-col">
+        <div>
+          <span class="tag tag--light" data-reveal>Para quem é</span>
+          <h2 class="h2" style="margin-top:22px" data-reveal>Ideal para</h2>
+        </div>
+        <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+          {s.forWho.map((f, i) => <div class="card" style="min-height:160px;background:#fff" data-reveal><span class="step__n" style="font-family:var(--mono);color:var(--hot);font-size:12px">0{i + 1}</span><h3 style="font-size:19px">{f}</h3></div>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQ items={s.faq} title={`Dúvidas sobre ${s.name.toLowerCase()}`} />
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <span class="tag">Outros serviços</span>
+      <div class="cards" style="margin-top:30px">
+        {others.map((o) => (
+          <a class="card" href={`/servicos/${o.slug}/`} style="min-height:200px">
+            <div class="card__top"><span class="card__icon"><Icon name="arrow" /></span></div>
+            <h3>{o.name}</h3><p>{o.short}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTA />
+</Base>

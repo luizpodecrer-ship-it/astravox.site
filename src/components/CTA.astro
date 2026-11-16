@@ -1,0 +1,19 @@
+---
+import Orbit from './Orbit.astro';
+import Icon from './Icon.astro';
+import { whatsappLink, SITE } from '../data/site';
+interface Props { title?: string; text?: string }
+const { title = 'Tem uma ideia? Vamos tirar do papel.', text = `Agende uma conversa gratuita de 20 minutos. Olhamos seu projeto juntos e sugerimos o melhor próximo passo. ${SITE.responseTime}.` } = Astro.props;
+---
+<section class="dark-shell" aria-labelledby="cta-title">
+  <div class="dark cta">
+    <Orbit />
+    <span class="tag tag--dark" data-reveal>Vamos conversar</span>
+    <h2 id="cta-title" data-reveal style="--d:.08s">{title}</h2>
+    <p data-reveal style="--d:.16s">{text}</p>
+    <div class="hero__ctas" data-reveal style="--d:.24s">
+      <a class="btn btn--accent" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
+      <a class="btn btn--light" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="wa" /> Chamar no WhatsApp</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,57 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { SITE, SERVICES, NAV, whatsappLink } from '../data/site';
+const year = new Date().getFullYear();
+const socials = [
+  ['Instagram', SITE.social.instagram], ['LinkedIn', SITE.social.linkedin],
+  ['Behance', SITE.social.behance], ['YouTube', SITE.social.youtube],
+].filter(([, u]) => u);
+---
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="/" class="logo" aria-label={`${SITE.name} — página inicial`}><Logo /></a>
+        <p>{SITE.description}</p>
+      </div>
+      <a class="btn btn--accent" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
+    </div>
+    <div class="footer__grid">
+      <div>
+        <p class="footer__claim">Ideias viram produto.<br />Produto vira resultado.</p>
+        <div class="contact-box">
+          <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>
+          <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>
+        </div>
+      </div>
+      <div>
+        <h3>Serviços</h3>
+        <ul role="list" class="footer__cols">
+          {SERVICES.map((s) => <li><a href={`/servicos/${s.slug}/`}>{s.name}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h3>Navegação</h3>
+        <ul role="list">
+          <li><a href="/">Início</a></li>
+          {NAV.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h3>Redes</h3>
+        <ul role="list">
+          {socials.map(([n, u]) => <li><a href={u} target="_blank" rel="noopener me">{n}</a></li>)}
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© {year} {SITE.legalName}. {SITE.address.city} · {SITE.address.region} · Brasil</span>
+      <nav aria-label="Legal">
+        <a href="/politica-de-privacidade/">Privacidade</a>
+        <a href="/sitemap-index.xml">Sitemap</a>
+      </nav>
+    </div>
+  </div>
+  <div class="wordmark" aria-hidden="true"><Logo variant="word" /></div>
+</footer>

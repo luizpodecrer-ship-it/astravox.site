@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import CTA from '../components/CTA.astro';
+import { SITE, STATS, PROCESS } from '../data/site';
+const values = [
+  ['Clareza acima de tudo', 'Se o usuário precisa pensar, o design ainda não está pronto.'],
+  ['Resultado mensurável', 'Cada projeto começa com uma métrica que queremos mover.'],
+  ['Parceria de verdade', 'Trabalhamos como parte do seu time, com comunicação semanal e transparente.'],
+  ['Tecnologia que dura', 'Código limpo e documentado, que sua equipe consegue manter e evoluir.'],
+];
+---
+<Base title="Sobre a Astravox | Agência Digital de Produtos e IA" description={`Conheça a Astravox: agência digital fundada em ${SITE.foundingYear} que une estratégia, design, desenvolvimento e inteligência artificial.`} headerVariant="light" breadcrumb={[{ name: 'Sobre', path: '/sobre/' }]}>
+  <section class="page-hero">
+    <div class="wrap">
+      <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Sobre</li></ol>
+      <span class="tag">Sobre nós</span>
+      <h1 class="display" data-split>A estrela que dá<br />voz às suas ideias.</h1>
+      <p class="lead" data-reveal>Astra é estrela; vox é voz. A Astravox nasceu em {SITE.foundingYear} para ajudar empresas a transformar ideias em produtos digitais que as pessoas entendem e usam — unindo estratégia, design, código e inteligência artificial.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap stats">
+      {STATS.map((s) => <div class="stat" data-reveal><p class="stat__value" data-count={s.value}>{s.value}</p><h2 class="h3" style="margin-top:22px;font-size:19px">{s.label}</h2><p>{s.detail}</p></div>)}
+    </div>
+  </section>
+  <section class="soft-shell">
+    <div class="soft section">
+      <div class="wrap">
+        <span class="tag tag--light">No que acreditamos</span>
+        <h2 class="h2" style="margin:22px 0 50px" data-split>Nossos valores</h2>
+        <div class="cards">
+          {values.map(([t, d], i) => <div class="card" data-reveal style={`background:#fff;min-height:220px;--d:${i * .06}s`}><span style="font-family:var(--mono);color:var(--hot);font-size:12px">0{i + 1}</span><h3>{t}</h3><p>{d}</p></div>)}
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap two-col">
+      <div><span class="tag">Processo</span><h2 class="h2" style="margin-top:22px">Como um projeto acontece</h2></div>
+      <ol class="list-check" role="list">
+        {PROCESS.map((p) => <li data-reveal><span style="font-family:var(--mono);color:var(--hot);font-size:12px;margin-top:5px">{p.step}</span><div><strong style="font-weight:500">{p.title}</strong><p class="muted" style="font-size:15px;margin-top:4px">{p.text}</p></div></li>)}
+      </ol>
+    </div>
+  </section>
+  <CTA />
+</Base>

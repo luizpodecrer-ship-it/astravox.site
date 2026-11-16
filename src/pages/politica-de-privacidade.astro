@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../data/site';
+---
+<Base title="Política de Privacidade | Astravox" description="Como a Astravox coleta, usa e protege seus dados pessoais, em conformidade com a LGPD (Lei nº 13.709/2018)." headerVariant="light" breadcrumb={[{ name: 'Política de privacidade', path: '/politica-de-privacidade/' }]}>
+  <section class="page-hero" style="padding-bottom:30px">
+    <div class="wrap"><span class="tag">Legal</span><h1 class="h2" style="margin-top:22px">Política de Privacidade</h1></div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap prose">
+      <p><!-- TODO: revisar com seu jurídico -->Esta política explica como a {SITE.legalName} ("Astravox") trata dados pessoais coletados neste site, conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).</p>
+      <h2>Dados que coletamos</h2>
+      <ul><li>Dados que você envia voluntariamente pelo formulário ou WhatsApp: nome, empresa, e-mail e a mensagem.</li><li>Dados de navegação anônimos (páginas visitadas, dispositivo), somente se você aceitar os cookies de métricas.</li></ul>
+      <h2>Para que usamos</h2>
+      <p>Para responder ao seu contato, preparar propostas e melhorar o conteúdo do site. Não vendemos nem compartilhamos seus dados para publicidade.</p>
+      <h2>Cookies</h2>
+      <p>Usamos o Google Analytics apenas após o seu consentimento no aviso de cookies. Você pode mudar de ideia a qualquer momento limpando os dados do site no navegador.</p>
+      <h2>Seus direitos</h2>
+      <p>Você pode solicitar acesso, correção ou exclusão dos seus dados pelo e-mail <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+      <p class="muted" style="margin-top:30px;font-size:14px">Última atualização: {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}.</p>
+    </div>
+  </section>
+</Base>

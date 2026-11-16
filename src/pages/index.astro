@@ -1,0 +1,248 @@
+---
+import Base from '../layouts/Base.astro';
+import Orbit from '../components/Orbit.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import Mock from '../components/Mock.astro';
+import FAQ from '../components/FAQ.astro';
+import CTA from '../components/CTA.astro';
+import { SITE, STATS, SERVICES, INDUSTRIES, CASES, PROCESS, TESTIMONIALS, FAQ as FAQS, whatsappLink } from '../data/site';
+
+const title = 'Astravox | Agência de Criação de Sites, Apps e IA';
+const description = 'A Astravox cria sites, aplicativos, plataformas SaaS e soluções com inteligência artificial para empresas que querem crescer. Fale com a gente.';
+
+const svcKinds = ['site', 'phone', 'dash', 'chat', 'ux', 'brand'] as const;
+const svcHues = [72, 150, 190, 85, 120, 170];
+const caseKinds = ['phone', 'chat', 'dash', 'site'] as const;
+const indIcons = ['rocket', 'heart', 'chart', 'bag'];
+
+const schema = [
+  {
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+  {
+    '@type': 'ItemList',
+    name: 'Serviços da Astravox',
+    itemListElement: SERVICES.map((s, i) => ({
+      '@type': 'ListItem', position: i + 1,
+      item: { '@type': 'Service', name: s.name, description: s.short, url: `${SITE.url}/servicos/${s.slug}/`, provider: { '@id': `${SITE.url}/#org` } },
+    })),
+  },
+];
+---
+<Base title={title} description={description} schema={schema}>
+  <!-- HERO -->
+  <div class="hero-shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <Orbit />
+      <div class="hero__top">
+        <span class="tag tag--dark">Agência digital de produtos & IA</span>
+        <h1 id="hero-title" class="display" data-split>Sites, apps e IA<br />que fazem sua<br /><span class="grad">empresa crescer.</span></h1>
+        <p class="hero__sub" data-reveal style="--d:.35s">Transformamos ideias complexas em produtos digitais claros, rápidos e fáceis de usar — do design ao código.</p>
+      </div>
+      <div class="hero__bottom" data-reveal style="--d:.5s">
+        <p class="hero__note"><span class="dot"></span> Agenda aberta para novos projetos</p>
+        <div class="hero__cta-box">
+          <p>Sites, Apps, Plataformas SaaS e Inteligência Artificial.</p>
+          <div class="hero__ctas">
+            <a class="btn btn--accent" href="/cases/">Ver projetos <Icon name="arrow" class="arrow" /></a>
+            <a class="btn btn--light avatar-btn" href={whatsappLink()} target="_blank" rel="noopener"><span class="av"><Logo variant="symbol" /></span> Falar com a gente</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- QUEM SOMOS -->
+  <section class="section" aria-labelledby="about-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="tag" data-reveal>Quem somos</span>
+          <h2 id="about-title" class="h2" data-split>Criamos produtos digitais<br />claros e confiáveis para<br />quem quer crescer.</h2>
+        </div>
+        <div class="sec-head__aside" data-reveal>
+          <p>Um time de designers, desenvolvedores e especialistas em IA que trabalha como parte da sua equipe, do primeiro workshop ao lançamento.</p>
+          <a class="link-u" href="/sobre/">Conheça a Astravox</a>
+        </div>
+      </div>
+      <div class="showcase">
+        <div class="shot" data-reveal><span class="tag">Dashboard SaaS</span><Mock kind="dash" hue={80} /></div>
+        <div class="shot" data-reveal style="--d:.1s"><span class="tag">Assistente de IA</span><Mock kind="chat" hue={150} /></div>
+        <div class="shot" data-reveal style="--d:.2s"><span class="tag">Site institucional</span><Mock kind="site" hue={72} /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NÚMEROS -->
+  <section class="section" style="padding-top:0" aria-labelledby="stats-title">
+    <div class="wrap">
+      <span class="tag" data-reveal>Em números</span>
+      <h2 id="stats-title" class="sr-only">A Astravox em números</h2>
+      <div class="stats" style="margin-top:50px">
+        {STATS.map((s, i) => (
+          <div class="stat" data-reveal style={`--d:${i * 0.08}s`}>
+            <p class="stat__value" data-count={s.value}>{s.value}</p>
+            <h3>{s.label}</h3>
+            <p>{s.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVIÇOS -->
+  <section class="dark-shell" aria-labelledby="svc-title">
+    <div class="dark section">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="tag tag--dark" data-reveal>Serviços</span>
+            <h2 id="svc-title" class="h2" data-split>Tudo o que seu<br />produto precisa.</h2>
+          </div>
+          <div class="sec-head__aside" data-reveal><p>Seis frentes com um só time: estratégia, design, desenvolvimento e inteligência artificial trabalhando juntos.</p></div>
+        </div>
+        <div class="svc-wrap">
+          <ul class="svc-list" role="list">
+            {SERVICES.map((s, i) => (
+              <li class="svc-item" data-text={s.short} data-label={s.name} data-reveal style={`--d:${i * 0.05}s`}>
+                <a href={`/servicos/${s.slug}/`}>
+                  <span class="arr"><Icon name="right" /></span>
+                  {s.name}<sup>[0{i + 1}]</sup>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div class="svc-panel" aria-hidden="true">
+            <div class="svc-panel__card">
+              {svcKinds.map((k, i) => <div class="svc-panel__art" style="opacity:0"><Mock kind={k} hue={svcHues[i]} dark /></div>)}
+            </div>
+            <p class="svc-panel__label" id="svc-label"></p>
+            <p class="svc-panel__text" id="svc-text"></p>
+          </div>
+        </div>
+        <div class="svc-foot" data-reveal>
+          <span class="tag tag--dark">Do zero ao ar</span>
+          Estratégia · UX/UI · Front-end · Back-end · Cloud · SEO · Automação com IA
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETORES -->
+  <section class="section" aria-labelledby="ind-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="tag" data-reveal>Setores</span>
+          <h2 id="ind-title" class="h2" data-split>Feito para negócios<br />onde confiança importa.</h2>
+        </div>
+        <div class="sec-head__aside" data-reveal><p>Startups e SaaS são o nosso núcleo. Saúde e finanças são especialidades, onde um bom design decide se as pessoas confiam no produto.</p></div>
+      </div>
+      <div class="cards">
+        {INDUSTRIES.map((ind, i) => (
+          <article class="card" data-reveal style={`--d:${i * 0.07}s`}>
+            <div class="card__top"><span class="card__icon"><Icon name={indIcons[i]} /></span><span class:list={['badge', ind.badge !== 'Core' && 'badge--hot']}>{ind.badge}</span></div>
+            <h3>{ind.name}</h3>
+            <p>{ind.text}</p>
+            <p class="chips">{ind.tags.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CASES -->
+  <section class="section" style="padding-top:0" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="tag" data-reveal>Trabalhos selecionados</span>
+          <h2 id="work-title" class="h2" data-split>Projetos em destaque<br />& resultados reais.</h2>
+        </div>
+        <div class="sec-head__aside" data-reveal>
+          <p>Alguns dos nossos projetos mais recentes e o impacto que geraram para cada cliente.</p>
+          <a class="link-u" href="/cases/">Todos os cases</a>
+        </div>
+      </div>
+      <div class="work">
+        {CASES.map((c, i) => (
+          <article class="work-card" data-reveal style={`--d:${(i % 2) * 0.1}s`}>
+            <div class="work-card__media" style={`--h:${c.hue}`}>
+              <span class="tag tag--light">{c.category}</span>
+              <div class="work-card__art"><Mock kind={caseKinds[i % 4]} hue={c.hue} /></div>
+              <span class="result">{c.result}</span>
+            </div>
+            <div class="work-card__meta">
+              <div><h3>{c.title}</h3><p>{c.text}</p></div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESSO -->
+  <section class="soft-shell" aria-labelledby="proc-title">
+    <div class="soft section">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="tag tag--light" data-reveal>Como trabalhamos</span>
+            <h2 id="proc-title" class="h2" data-split>Um time completo,<br />um processo claro.</h2>
+          </div>
+          <div class="sec-head__aside" data-reveal><p>Você sabe o que está acontecendo em cada semana do projeto, o que vem a seguir e quando vai ao ar.</p></div>
+        </div>
+        <ol class="process" role="list">
+          {PROCESS.map((p, i) => (
+            <li class:list={['step', i === 2 && 'step--dark']} data-reveal style={`--d:${i * 0.07}s`}>
+              <span class="step__n">{p.step}</span>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))}
+        </ol>
+        <ul class="perks" role="list">
+          <li><span class="check"><Icon name="check" /></span> Conversa inicial gratuita</li>
+          <li><span class="check"><Icon name="check" /></span> Código e arquivos são seus</li>
+          <li><span class="check"><Icon name="check" /></span> Revisão com você toda semana</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <FAQ items={FAQS} />
+
+  <!-- DEPOIMENTOS -->
+  <section class="soft-shell" aria-labelledby="t-title">
+    <div class="soft section">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="tag tag--light" data-reveal>Depoimentos</span>
+            <h2 id="t-title" class="h2" data-split>O que nossos clientes<br />dizem do nosso trabalho.</h2>
+          </div>
+          <div class="sec-head__aside" data-reveal><p>Avaliações reais de quem já construiu com a gente.</p></div>
+        </div>
+        <div class="quotes">
+          {TESTIMONIALS.map((t, i) => (
+            <figure class="quote" data-reveal style={`--d:${i * 0.06}s`}>
+              <div class="quote__top"><span class="stars-r">{[1, 2, 3, 4, 5].map(() => <Icon name="star" />)}</span><span class="qm">”</span></div>
+              <blockquote>{t.quote}</blockquote>
+              <figcaption><span class="ini">{t.initials}</span><div>{t.name}<span>{t.role}</span></div></figcaption>
+            </figure>
+          ))}
+          <div class="quote quote--accent" data-reveal style="--d:.3s">
+            <p class="big">4,9 <span class="stars-r">{[1, 2, 3, 4, 5].map(() => <Icon name="star" />)}</span></p>
+            <p>Nota média dos nossos clientes. Quer conversar com um deles? Pedimos a indicação para você.</p>
+            <a class="link-u" style="border-color:var(--ink);color:var(--ink);margin-top:auto" href="/contato/">Falar com a Astravox</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:clamp(60px,8vw,110px)"></div>
+  <CTA />
+</Base>

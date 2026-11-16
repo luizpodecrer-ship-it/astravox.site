@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { SITE, SERVICES, whatsappLink } from '../data/site';
+const schema = [{ '@type': 'ContactPage', name: 'Contato — Astravox', url: `${SITE.url}/contato/` }];
+---
+<Base title="Contato | Astravox — Vamos Criar Seu Projeto" description={`Fale com a Astravox e comece seu projeto de site, app, SaaS ou projeto com IA. ${SITE.responseTime}.`} schema={schema} headerVariant="light" breadcrumb={[{ name: 'Contato', path: '/contato/' }]}>
+  <section class="page-hero" style="padding-bottom:40px">
+    <div class="wrap">
+      <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Contato</li></ol>
+      <span class="tag">Contato</span>
+      <h1 class="display" data-split>Vamos construir<br />algo juntos?</h1>
+      <p class="lead" data-reveal>Conte um pouco sobre o projeto. {SITE.responseTime} com os próximos passos.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:20px">
+    <div class="wrap two-col">
+      <aside>
+        <div class="contact-box" style="margin-top:0">
+          <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>
+          <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>
+          {SITE.calendarUrl && <a href={SITE.calendarUrl} target="_blank" rel="noopener"><span class="mono">Agenda</span><span>Marcar uma conversa</span></a>}
+        </div>
+        <p class="muted" style="margin-top:20px;font-size:14px">{SITE.address.city} · {SITE.address.region} — atendimento remoto para todo o Brasil e exterior.</p>
+      </aside>
+      <form class="form" id="contact-form" data-wa={SITE.whatsapp} novalidate>
+        <div class="row">
+          <div class="field"><label for="nome">Nome *</label><input id="nome" name="nome" autocomplete="name" required /></div>
+          <div class="field"><label for="empresa">Empresa</label><input id="empresa" name="empresa" autocomplete="organization" /></div>
+        </div>
+        <div class="field"><label for="email">E-mail *</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
+        <fieldset class="field" style="border:0;padding:0;margin:0">
+          <legend style="font-weight:500;margin-bottom:8px">Do que você precisa?</legend>
+          <div class="chips-select">
+            {SERVICES.map((s) => <label><input type="checkbox" name="servico" value={s.name} /><span>{s.name}</span></label>)}
+          </div>
+        </fieldset>
+        <div class="field"><label for="mensagem">Conte sobre o projeto *</label><textarea id="mensagem" name="mensagem" required></textarea></div>
+        <button class="btn btn--accent" type="submit" style="justify-self:start">Enviar pelo WhatsApp <Icon name="arrow" class="arrow" /></button>
+        <p class="form-note">Ao enviar, você concorda com nossa <a href="/politica-de-privacidade/" style="text-decoration:underline">política de privacidade</a>.</p>
+      </form>
+    </div>
+  </section>
+</Base>

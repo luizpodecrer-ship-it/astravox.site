@@ -1,16 +1,27 @@
-# React + Vite
+# Site Astravox
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site institucional da Astravox em [Astro](https://astro.build) (estático, ~2 KB de JS).
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # gera dist/ para publicar
+npm run og       # regenera ícones e imagem de compartilhamento
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Antes de publicar
+Todos os dados ficam em `src/data/site.ts`. Troque tudo marcado com `TODO`:
+domínio, e-mail, WhatsApp, cidade, redes sociais, números, cases e depoimentos.
 
-## React Compiler
+## SEO incluído
+- Title e meta description únicos por página; canonical; Open Graph e Twitter Card
+- JSON-LD: Organization/ProfessionalService, WebSite, WebPage, BreadcrumbList, Service, FAQPage, ItemList
+- Uma página por serviço (palavras-chave long tail), URLs amigáveis em português
+- `sitemap-index.xml`, `robots.txt` e `llms.txt` (buscadores com IA) gerados no build
+- HTML estático, fontes auto-hospedadas com preload, sem imagens pesadas: Core Web Vitals altos
+- Google Analytics só carrega após consentimento (LGPD)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Publicação
+Cloudflare Pages, Netlify ou Vercel: build `npm run build`, saída `dist`.
+Depois, cadastre o domínio no Google Search Console, cole o código em
+`googleSiteVerification` e envie o `sitemap-index.xml`.
