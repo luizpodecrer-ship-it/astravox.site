@@ -7,7 +7,7 @@
 export const SITE = {
   name: 'Astravox',
   legalName: 'Astravox Tecnologia LTDA', // TODO: razão social
-  url: 'https://www.astravox.com.br', // TODO: domínio definitivo (sem barra no final)
+  url: 'https://astravox.com.br', // domínio principal (sem barra no final)
   locale: 'pt_BR',
   lang: 'pt-BR',
   tagline: 'Agência digital de produtos, sites e IA',

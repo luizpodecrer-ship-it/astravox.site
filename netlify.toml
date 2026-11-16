@@ -1,0 +1,20 @@
+# Configuração do Netlify para o site Astravox (Astro estático)
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Redireciona o domínio sem www e o subdomínio do Netlify para o domínio principal (evita conteúdo duplicado no Google)
+[[redirects]]
+  from = "https://siteastravox.netlify.app/*"
+  to = "https://astravox.com.br/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.astravox.com.br/*"
+  to = "https://astravox.com.br/:splat"
+  status = 301
+  force = true
