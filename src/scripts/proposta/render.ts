@@ -71,6 +71,23 @@ function logoSymbol() {
   return svg;
 }
 
+/** Seções da proposta, na ordem em que o cliente vê. Seção vazia não aparece e não recebe número. */
+export type SecKey = 'intro' | 'objetivos' | 'escopo' | 'cronograma' | 'investimento' | 'pagamento' | 'proximos';
+export const SECOES: { key: SecKey; titulo: string; preenchida: (p: Proposta) => boolean }[] = [
+  { key: 'intro', titulo: 'Introdução', preenchida: (p) => !!p.introducao.trim() },
+  { key: 'objetivos', titulo: 'Objetivos', preenchida: (p) => p.objetivos.some((o) => o.trim()) },
+  { key: 'escopo', titulo: 'Escopo', preenchida: (p) => p.escopo.some((e) => e.titulo.trim() || e.descricao.trim()) },
+  { key: 'cronograma', titulo: 'Cronograma', preenchida: (p) => p.cronograma.some((e) => e.titulo.trim() || e.dias) },
+  { key: 'investimento', titulo: 'Investimento', preenchida: (p) => p.investimento.itens.some((i) => i.descricao.trim() || i.valor) || !!p.investimento.observacao.trim() },
+  { key: 'pagamento', titulo: 'Condições de pagamento', preenchida: (p) => !!p.pagamento.trim() },
+  { key: 'proximos', titulo: 'Próximos passos', preenchida: (p) => !!p.proximosPassos.trim() },
+];
+/** Número de cada seção como aparece na proposta (null = vazia, não aparece). */
+export function numeracao(p: Proposta): Record<SecKey, number | null> {
+  let n = 0;
+  return Object.fromEntries(SECOES.map((s) => [s.key, s.preenchida(p) ? ++n : null])) as Record<SecKey, number | null>;
+}
+
 export type RenderOptions = {
   /** Mostra os botões de aceite (página do cliente). */
   interativo?: boolean;
@@ -101,20 +118,21 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
     ),
   );
 
-  // ---------- Seções (numeradas só as que têm conteúdo) ----------
-  const sections: [string, Node][] = [];
-  if (p.introducao.trim()) sections.push(['Introdução', h('div', { class: 'pp-text' }, paragraphs(p.introducao))]);
+  // ---------- Seções (numeradas só as que têm conteúdo; mesma regra do formulário) ----------
+  const sections: [SecKey, string, Node][] = [];
+  const push = (key: SecKey, body: Node) => sections.push([key, SECOES.find((x) => x.key === key)!.titulo, body]);
+  if (p.introducao.trim()) push('intro', h('div', { class: 'pp-text' }, paragraphs(p.introducao)));
   const objetivos = p.objetivos.filter((o) => o.trim());
-  if (objetivos.length) sections.push(['Objetivos', h('ul', { class: 'pp-checks' }, objetivos.map((o) => h('li', {}, h('span', { class: 'pp-check', 'aria-hidden': 'true' }, '✓'), o)))]);
+  if (objetivos.length) push('objetivos', h('ul', { class: 'pp-checks' }, objetivos.map((o) => h('li', {}, h('span', { class: 'pp-check', 'aria-hidden': 'true' }, '✓'), o))));
   const escopo = p.escopo.filter((e) => e.titulo.trim() || e.descricao.trim());
-  if (escopo.length) sections.push(['Escopo', h('div', { class: 'pp-cards' }, escopo.map((e, i) => h('div', { class: 'pp-card' }, h('span', { class: 'pp-n' }, String(i + 1).padStart(2, '0')), h('h3', {}, e.titulo), e.descricao ? h('div', { class: 'pp-text' }, paragraphs(e.descricao)) : null)))]);
+  if (escopo.length) push('escopo', h('div', { class: 'pp-cards' }, escopo.map((e, i) => h('div', { class: 'pp-card' }, h('span', { class: 'pp-n' }, String(i + 1).padStart(2, '0')), h('h3', {}, e.titulo), e.descricao ? h('div', { class: 'pp-text' }, paragraphs(e.descricao)) : null))));
   const etapas = p.cronograma.filter((e) => e.titulo.trim() || e.dias);
   if (etapas.length) {
     const total = totalDias({ cronograma: etapas });
-    sections.push(['Cronograma', h('div', {},
+    push('cronograma', h('div', {},
       h('ol', { class: 'pp-timeline' }, etapas.map((e) => h('li', {}, h('span', { class: 'pp-dot', 'aria-hidden': 'true' }), h('strong', {}, e.titulo), e.dias ? h('span', { class: 'pp-prazo' }, diasTxt(e.dias)) : null))),
       total ? h('p', { class: 'pp-total-time' }, h('span', {}, 'Prazo total estimado'), h('strong', {}, diasTxt(total))) : null,
-    )]);
+    ));
   }
   const itens = p.investimento.itens.filter((i) => i.descricao.trim() || i.valor);
   if (itens.length || p.investimento.observacao.trim()) {
@@ -125,13 +143,13 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
           p.investimento.mostrarTotal && itens.length > 0 ? h('tfoot', {}, h('tr', {}, h('td', {}, 'Total'), h('td', {}, h('span', { class: 'pp-total' }, brl(total))))) : null,
         )
       : null;
-    sections.push(['Investimento', h('div', {}, table, p.investimento.observacao.trim() ? h('div', { class: 'pp-text pp-note' }, paragraphs(p.investimento.observacao)) : null)]);
+    push('investimento', h('div', {}, table, p.investimento.observacao.trim() ? h('div', { class: 'pp-text pp-note' }, paragraphs(p.investimento.observacao)) : null));
   }
-  if (p.pagamento.trim()) sections.push(['Condições de pagamento', h('div', { class: 'pp-text' }, paragraphs(p.pagamento))]);
-  if (p.proximosPassos.trim()) sections.push(['Próximos passos', h('div', { class: 'pp-text' }, paragraphs(p.proximosPassos))]);
+  if (p.pagamento.trim()) push('pagamento', h('div', { class: 'pp-text' }, paragraphs(p.pagamento)));
+  if (p.proximosPassos.trim()) push('proximos', h('div', { class: 'pp-text' }, paragraphs(p.proximosPassos)));
 
-  sections.forEach(([title, body], i) => {
-    root.append(h('section', { class: 'pp-section' }, h('div', { class: 'pp-section__head' }, h('span', { class: 'pp-n' }, String(i + 1).padStart(2, '0')), h('h2', {}, title)), body));
+  sections.forEach(([key, title, body], i) => {
+    root.append(h('section', { class: 'pp-section', 'data-sec': key }, h('div', { class: 'pp-section__head' }, h('span', { class: 'pp-n' }, String(i + 1).padStart(2, '0')), h('h2', {}, title)), body));
   });
   if (!sections.length) root.append(h('p', { class: 'pp-empty' }, 'Comece a preencher a proposta no editor ao lado.'));
 

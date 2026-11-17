@@ -1,5 +1,5 @@
 // Painel de propostas: login, lista e editor com salvamento automático e prévia ao vivo.
-import { renderProposta, brl, diasTxt, totalDias, h, type Proposta } from './render';
+import { renderProposta, brl, diasTxt, totalDias, numeracao, h, type Proposta, type SecKey } from './render';
 import { PRODUTOS, type Produto } from '../../data/produtos';
 
 type Prop = Proposta & { cliente: Proposta['cliente'] & { whatsapp: string; email: string }; produtos: string[]; notasInternas: string };
@@ -447,7 +447,7 @@ function refreshIntro(force = false) {
   updateIntroHint();
 }
 function updateIntroHint() {
-  const editado = !!current && current.introducao.trim() !== '' && current.introducao.trim() !== introAuto.trim();
+  const editado = !!current && current.introducao.trim() !== introAuto.trim(); // inclui texto apagado
   $('intro-reset').hidden = !editado;
   $('intro-auto').hidden = editado;
 }
@@ -498,11 +498,42 @@ function fillForm() {
   ($('open-client') as HTMLAnchorElement).href = `/p/${current.id}`;
 }
 
+/** Números das seções no formulário = números na proposta (vazia: "—", não aparece). */
+function updateNumeros() {
+  if (!current) return;
+  const nums = numeracao(current);
+  form.querySelectorAll<HTMLElement>('[data-num]').forEach((el) => {
+    const n = nums[el.dataset.num as SecKey];
+    el.textContent = n ? String(n).padStart(2, '0') : '—';
+    el.classList.toggle('is-off', !n);
+  });
+  form.querySelectorAll<HTMLElement>('[data-off]').forEach((el) => { el.hidden = !!nums[el.dataset.off as SecKey]; });
+}
+
+/* Ao editar uma seção, a prévia vai até ela e a destaca. */
+let secAtual = '';
+function marcarSecao(key: string, rolar: boolean) {
+  secAtual = key;
+  form.querySelectorAll('.ad-step').forEach((el) => el.classList.toggle('is-current', (el as HTMLElement).dataset.sec === key && key !== 'capa'));
+  preview.querySelectorAll('.pp-section').forEach((el) => el.classList.toggle('is-current', (el as HTMLElement).dataset.sec === key));
+  if (!rolar) return;
+  const alvo = key === 'capa' ? preview.querySelector<HTMLElement>('.pp-cover') : preview.querySelector<HTMLElement>(`.pp-section[data-sec="${key}"]`);
+  if (!alvo) return;
+  const top = alvo.getBoundingClientRect().top - preview.getBoundingClientRect().top + preview.scrollTop - 12;
+  preview.scrollTo({ top, behavior: 'smooth' });
+}
+form.addEventListener('focusin', (e) => {
+  const sec = (e.target as HTMLElement).closest<HTMLElement>('[data-sec]')?.dataset.sec;
+  if (sec && sec !== secAtual) marcarSecao(sec, true);
+});
+
 function drawPreview() {
   if (!current) return;
   const scroll = preview.scrollTop;
   preview.replaceChildren(renderProposta(current, { interativo: false }));
   preview.scrollTop = scroll;
+  updateNumeros();
+  if (secAtual) marcarSecao(secAtual, false);
   const total = current.investimento.itens.reduce((s, i) => s + (i.valor || 0), 0);
   $('total').textContent = current.investimento.itens.length ? `Total: ${brl(total)}` : '';
   updateTotalDias();
