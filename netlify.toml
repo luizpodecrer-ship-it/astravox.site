@@ -6,6 +6,25 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Link do cliente: /p/<código> abre a página única da proposta
+[[redirects]]
+  from = "/p/*"
+  to = "/p/index.html"
+  status = 200
+
+# Áreas privadas nunca entram no Google
+[[headers]]
+  for = "/p/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "no-referrer"
+    Cache-Control = "no-store"
+[[headers]]
+  for = "/propostas/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+
 # Redireciona o domínio sem www e o subdomínio do Netlify para o domínio principal (evita conteúdo duplicado no Google)
 [[redirects]]
   from = "https://siteastravox.netlify.app/*"

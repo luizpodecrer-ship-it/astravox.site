@@ -7,12 +7,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "og": "node scripts/og.mjs"
+    "og": "node scripts/og.mjs",
+    "test:propostas": "node --experimental-strip-types --no-warnings tests/propostas.e2e.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",
     "@fontsource-variable/geist": "^5.2.8",
     "@fontsource-variable/geist-mono": "^5.2.7",
+    "@netlify/blobs": "^11.1.9",
+    "@netlify/functions": "^6.1.1",
     "astro": "^5.15.0"
   }
 }

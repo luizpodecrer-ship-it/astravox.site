@@ -1,0 +1,98 @@
+---
+// Página do cliente: /p/<código> (o netlify.toml reescreve qualquer /p/* para esta página).
+import App from '../../layouts/App.astro';
+---
+<App title="Proposta · Astravox">
+  <div class="pv-bar no-print" id="pv-bar" hidden>
+    <span class="pv-live"><i></i> Atualiza em tempo real</span>
+    <button class="pv-print" type="button" id="pv-print">Salvar em PDF</button>
+  </div>
+  <main class="pv" id="pv" aria-live="polite">
+    <p class="pv-loading">Carregando proposta…</p>
+  </main>
+  <div class="pv-toast no-print" id="pv-toast" role="status"></div>
+</App>
+
+<style is:global>
+  body.app { background: #fff; }
+  .pv { padding: 8px 8px 40px; }
+  .pv-loading, .pv-error { text-align: center; padding: 30vh 20px; color: var(--muted); }
+  .pv-error h1 { font-size: 32px; letter-spacing: -.03em; color: var(--ink); font-weight: 500; margin-bottom: 10px; }
+  .pv-bar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 12px; max-width: 920px; margin: 0 auto; padding: 10px 14px; background: rgba(255,255,255,.88); backdrop-filter: blur(10px); }
+  .pv-bar[hidden] { display: none; }
+  .pv-live { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+  .pv-live i { width: 7px; height: 7px; border-radius: 50%; background: #3ad29f; box-shadow: 0 0 0 4px rgba(58,210,159,.18); animation: blink 2.4s infinite; }
+  .pv-print { font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; background: #fff; cursor: pointer; }
+  .pv-toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 30px); opacity: 0; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; transition: all .4s var(--ease); pointer-events: none; }
+  .pv-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+  .pp.is-updated { animation: pv-flash 1.2s var(--ease); }
+  @keyframes pv-flash { from { opacity: .4; } }
+</style>
+
+<script>
+  import { renderProposta, type Proposta } from '../../scripts/proposta/render';
+
+  const id = location.pathname.split('/').filter(Boolean)[1] ?? '';
+  const main = document.getElementById('pv')!;
+  const bar = document.getElementById('pv-bar')!;
+  const toast = document.getElementById('pv-toast')!;
+  let last = '';
+  let first = true;
+
+  function showToast(text: string) {
+    toast.textContent = text;
+    toast.classList.add('is-on');
+    setTimeout(() => toast.classList.remove('is-on'), 2600);
+  }
+
+  async function aceitar(nome: string) {
+    const r = await fetch(`/api/p/${id}/aceite`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nome }) });
+    if (!r.ok) throw new Error(String(r.status));
+    draw(await r.json(), true);
+    showToast('Proposta aceita. Obrigado!');
+  }
+
+  function draw(p: Proposta, flash = false) {
+    document.title = `${p.titulo} · Astravox`;
+    const doc = renderProposta(p, { interativo: true, onAceitar: aceitar });
+    if (flash) doc.classList.add('is-updated');
+    // Preserva o nome digitado no campo de aceite durante as atualizações.
+    const typed = (main.querySelector('.pp-form input') as HTMLInputElement | null)?.value;
+    main.replaceChildren(doc);
+    const input = main.querySelector('.pp-form input') as HTMLInputElement | null;
+    if (typed && input) input.value = typed;
+    bar.hidden = false;
+  }
+
+  async function load() {
+    if (document.hidden && !first) return;
+    try {
+      const r = await fetch(`/api/p/${encodeURIComponent(id)}${first ? '?v=1' : ''}`, { cache: 'no-store' });
+      if (r.status === 404) {
+        main.innerHTML = '<div class="pv-error"><h1>Proposta não encontrada</h1><p>O link pode estar incompleto ou a proposta foi removida. Fale com a Astravox.</p></div>';
+        return;
+      }
+      if (!r.ok) throw new Error(String(r.status));
+      const p: Proposta = await r.json();
+      const sig = p.atualizadaEm + (p.aceite?.em ?? '') + p.status;
+      if (sig !== last) {
+        const updated = !first;
+        last = sig;
+        const active = document.activeElement;
+        if (!(active instanceof HTMLInputElement && active.closest('.pp-form'))) {
+          draw(p, updated);
+          if (updated) showToast('A proposta foi atualizada');
+        } else last = ''; // cliente digitando: tenta de novo no próximo ciclo
+      }
+    } catch {
+      if (first) main.innerHTML = '<div class="pv-error"><h1>Não foi possível carregar</h1><p>Verifique sua conexão e recarregue a página.</p></div>';
+    } finally {
+      first = false;
+    }
+  }
+
+  document.getElementById('pv-print')!.addEventListener('click', () => window.print());
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+  load();
+  setInterval(load, 5000);
+</script>
