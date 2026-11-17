@@ -43,11 +43,11 @@
 .pp-card h3 { font-size: 19px; font-weight: 500; letter-spacing: -.02em; }
 .pp-card .pp-text { font-size: 14.5px; color: var(--muted); }
 .pp-timeline { list-style: none; margin: 0; padding: 0 0 0 4px; display: grid; gap: 0; }
-.pp-timeline li { position: relative; display: flex; justify-content: space-between; gap: 18px; padding: 14px 0 14px 28px; border-left: 2px solid var(--line); flex-wrap: wrap; }
+.pp-timeline li { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 14px; padding: 14px 0 14px 28px; border-left: 2px solid var(--line); }
 .pp-timeline li:last-child { border-left-color: transparent; }
 .pp-dot { position: absolute; left: -7px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--ink); }
 .pp-timeline strong { font-weight: 500; font-size: 16.5px; }
-.pp-prazo { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); background: var(--soft); border: 1px solid var(--line); padding: 3px 10px; border-radius: 999px; }
+.pp-prazo { white-space: nowrap; font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); background: var(--soft); border: 1px solid var(--line); padding: 3px 10px; border-radius: 999px; }
 .pp-total-time { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; padding: 16px 20px; border-radius: 14px; background: var(--ink); color: #fff; }
 .pp-total-time span { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.6); }
 .pp-total-time strong { font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: var(--lime); }
@@ -98,3 +98,11 @@
 }
 .pp-btn, .pp-form input { font-family: var(--body-font); font-weight: 700; }
 .pp-form input { font-weight: 400; }
+
+/* Celular: botões de ação com largura total e alvos de toque confortáveis */
+@media (max-width: 600px) {
+  .pp-form { flex-direction: column; }
+  .pp-form input, .pp-form .pp-btn, .pp-accept .pp-btn { width: 100%; flex: none; }
+  .pp-btn--ghost { justify-self: stretch; }
+  .pp-next { justify-items: stretch; }
+}

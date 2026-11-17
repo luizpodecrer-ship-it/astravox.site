@@ -22,7 +22,7 @@ import App from '../../layouts/App.astro';
   .pv-bar[hidden] { display: none; }
   .pv-live { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
   .pv-live i { width: 7px; height: 7px; border-radius: 50%; background: #3ad29f; box-shadow: 0 0 0 4px rgba(58,210,159,.18); animation: blink 2.4s infinite; }
-  .pv-print { font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; background: #fff; cursor: pointer; }
+  .pv-print { font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; min-height: 44px; padding: 0 16px; background: #fff; cursor: pointer; }
   .pv-toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 30px); opacity: 0; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; transition: all .4s var(--ease); pointer-events: none; }
   .pv-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
   .pp.is-updated { animation: pv-flash 1.2s var(--ease); }
