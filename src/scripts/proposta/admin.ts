@@ -129,6 +129,18 @@ async function loadList() {
   );
 }
 
+$('test-aviso').addEventListener('click', async (e) => {
+  const btn = e.currentTarget as HTMLButtonElement;
+  btn.disabled = true;
+  try {
+    const r = await api<{ ok: boolean; status?: number; erro?: string }>('/api/admin/aviso-teste', { method: 'POST', body: '{}' });
+    if (r.ok) showToast('Aviso de teste enviado. Confira seu WhatsApp.');
+    else if (r.erro === 'nao_configurado') alert('O aviso no WhatsApp ainda não foi configurado no Netlify (WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID e AVISO_WHATSAPP_PARA).');
+    else alert(`O WhatsApp recusou o envio (código ${r.status ?? '?'}).\n\n${r.erro ?? ''}`);
+  } catch { showToast('Não foi possível testar agora'); }
+  btn.disabled = false;
+});
+
 $('new-proposal').addEventListener('click', async () => {
   const p = await api<Proposta>('/api/admin/propostas', { method: 'POST', body: '{}' });
   go(p.id);

@@ -12,7 +12,15 @@ process.env.NETLIFY_BLOBS_CONTEXT = Buffer.from(JSON.stringify({ siteID: 'site',
 const ENV = { PROPOSTAS_USUARIO: 'Luiz', PROPOSTAS_SENHA: 'senha-de-teste-123' };
 globalThis.Netlify = { env: { get: (k) => (k in ENV ? ENV[k] : process.env[k]), set: (k, v) => { process.env[k] = v; }, has: (k) => k in ENV || k in process.env, toObject: () => ({ ...process.env, ...ENV }) } };
 
+// Intercepta a API do WhatsApp (nada é enviado de verdade).
+const metaCalls = [];
+const realFetch = globalThis.fetch;
+globalThis.fetch = async (url, init) => {
+  if (String(url).startsWith('https://graph.facebook.com/')) { metaCalls.push({ url: String(url), init }); return new Response('{"messages":[{"id":"wamid.x"}]}', { status: 200 }); }
+  return realFetch(url, init);
+};
 const auth = (await import(join(REPO, 'netlify/functions/auth.mts'))).default;
+const aviso = (await import(join(REPO, 'netlify/functions/admin-aviso.mts'))).default;
 const admin = (await import(join(REPO, 'netlify/functions/admin-propostas.mts'))).default;
 const pub = (await import(join(REPO, 'netlify/functions/proposta-publica.mts'))).default;
 
@@ -84,10 +92,29 @@ await call(admin, 'PUT', `/api/admin/propostas/${id}`, { body: { ...p, status: '
 r = await call(pub, 'GET', `/api/p/${id}`, { params: { id } });
 check('cliente vê a edição na hora', r.data.titulo === 'Novo site + SEO');
 
+r = await call(aviso, 'POST', '/api/admin/aviso-teste', { body: {}, jar: admJar });
+check('teste de aviso sem configuração não envia', r.data.erro === 'nao_configurado' && metaCalls.length === 0);
+r = await call(aviso, 'POST', '/api/admin/aviso-teste', { body: {} });
+check('teste de aviso exige login', r.status === 401);
+Object.assign(ENV, { WHATSAPP_TOKEN: 'tok-meta', WHATSAPP_PHONE_NUMBER_ID: '123456', AVISO_WHATSAPP_PARA: '55 (65) 99811-3738' });
+r = await call(aviso, 'POST', '/api/admin/aviso-teste', { body: {}, jar: admJar });
+check('teste de aviso envia quando configurado', r.data.ok === true && metaCalls.length === 1);
+metaCalls.length = 0;
 r = await call(pub, 'POST', `/api/p/${id}/aceite`, { body: { nome: 'M' }, params: { id } });
 check('aceite exige nome', r.status === 400);
 r = await call(pub, 'POST', `/api/p/${id}/aceite`, { body: { nome: 'Maria Souza' }, params: { id } });
 check('cliente aceita', r.status === 200 && r.data.status === 'aceita' && r.data.aceite.nome === 'Maria Souza');
+{
+  const call0 = metaCalls[0];
+  const body = call0 ? JSON.parse(call0.init.body) : null;
+  check('aceite dispara aviso no WhatsApp', metaCalls.length === 1);
+  check('aviso vai para o seu número', body?.to === '5565998113738', body?.to);
+  check('aviso usa o modelo aprovado', body?.type === 'template' && body.template.name === 'proposta_aceita' && body.template.language.code === 'pt_BR');
+  check('aviso leva nome, empresa, título e link do painel', JSON.stringify(body?.template.components[0].parameters.map((x) => x.text)) === JSON.stringify(['Maria Souza', 'Clínica X', 'Novo site + SEO', `https://astravox.com.br/propostas/?id=${id}`]), JSON.stringify(body?.template.components[0].parameters.map((x) => x.text)));
+  check('token vai só no cabeçalho', call0?.init.headers.authorization === 'Bearer tok-meta' && !call0.url.includes('tok-meta'));
+}
+r = await call(pub, 'POST', `/api/p/${id}/aceite`, { body: { nome: 'Outra Pessoa' }, params: { id } });
+check('aceite repetido não manda aviso de novo', metaCalls.length === 1);
 
 // Editor com dados antigos não apaga o aceite
 r = await call(admin, 'PUT', `/api/admin/propostas/${id}`, { body: { ...p, status: 'enviada' }, jar: admJar, params: { id } });

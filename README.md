@@ -37,3 +37,10 @@ Editor privado de propostas comerciais com link para o cliente (`/p/<código>`),
   `src/pages/p/` (página do cliente), `src/scripts/proposta/` (editor e renderização).
 - **Teste:** `npm run test:propostas` (servidor de testes do Netlify Blobs, sem tocar em produção).
 - Rascunhos só abrem para quem está logado; o cliente só vê a proposta com status *Enviada* (ou aceita/recusada).
+
+### Aviso no WhatsApp quando o cliente aceita
+Usa a API oficial do WhatsApp (Meta Cloud API), em `netlify/lib/avisos.mts`. Variáveis no Netlify (escopo Functions):
+`WHATSAPP_TOKEN` (secreta), `WHATSAPP_PHONE_NUMBER_ID`, `AVISO_WHATSAPP_PARA` (seu número com 55 + DDD) e, opcionais,
+`WHATSAPP_TEMPLATE` (padrão `proposta_aceita`), `WHATSAPP_TEMPLATE_LANG` (`pt_BR`), `WHATSAPP_API_VERSION` (`v23.0`).
+O modelo de mensagem (categoria Utilidade) tem 4 variáveis: nome de quem aceitou, empresa, título da proposta e link do painel.
+Sem as variáveis, nada é enviado. O botão "Testar aviso no WhatsApp" do painel confere a configuração.

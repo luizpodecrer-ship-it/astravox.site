@@ -3,6 +3,7 @@
 //   POST /api/p/:id/aceite     { nome } registra o aceite
 import type { Config, Context } from '@netlify/functions';
 import { json, isAuthenticated } from '../lib/auth.mts';
+import { enviarAvisoWhatsApp } from '../lib/avisos.mts';
 import { publicView, normalize, store, viewsStore, validId, type Proposta } from '../lib/propostas.mts';
 
 export default async (req: Request, context: Context) => {
@@ -40,6 +41,8 @@ export default async (req: Request, context: Context) => {
       const next: Proposta = { ...p, status: 'aceita', aceite: { nome, em: new Date().toISOString() } };
       const { modified } = await db.setJSON(id, next, { onlyIfMatch: entry.etag });
       if (!modified) return json({ error: 'retry' }, 409);
+      // Aviso no WhatsApp em segundo plano: não atrasa nem falha o aceite do cliente.
+      context.waitUntil(enviarAvisoWhatsApp(next, context.site?.url || new URL(req.url).origin));
       return json(publicView(next));
     }
 

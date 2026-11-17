@@ -55,7 +55,10 @@ import Logo from '../../components/Logo.astro';
   <main class="ad-list wrap" id="v-list" hidden>
     <div class="ad-list__head">
       <div><span class="tag">Painel</span><h1 class="h2" style="margin-top:16px">Suas propostas</h1></div>
-      <button class="btn btn--accent" id="new-proposal" type="button">+ Nova proposta</button>
+      <div class="ad-list__actions">
+        <button class="btn btn--ghost" id="test-aviso" type="button" title="Envia uma mensagem de teste para o seu WhatsApp">Testar aviso no WhatsApp</button>
+        <button class="btn btn--accent" id="new-proposal" type="button">+ Nova proposta</button>
+      </div>
     </div>
     <div class="ad-cards" id="list"></div>
   </main>
@@ -230,6 +233,7 @@ import Logo from '../../components/Logo.astro';
 
   .ad-list { padding-top: 50px; padding-bottom: 80px; }
   .ad-list__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+  .ad-list__actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .ad-cards { display: grid; gap: 12px; }
   .ad-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px 20px; display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: center; }
   .ad-card h2 { font-size: 18px; font-weight: 500; letter-spacing: -.02em; }
