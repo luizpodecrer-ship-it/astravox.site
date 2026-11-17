@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Mock from '../components/Mock.astro';
 import CTA from '../components/CTA.astro';
 import { CASES } from '../data/site';
+if (!CASES.length) return Astro.redirect('/servicos/');
 const kinds = ['phone', 'chat', 'dash', 'site'] as const;
 ---
 <Base title="Cases e Portfólio de Projetos Digitais | Astravox" description="Veja projetos de sites, apps, plataformas SaaS e IA criados pela Astravox e os resultados que geraram para nossos clientes." headerVariant="light" breadcrumb={[{ name: 'Cases', path: '/cases/' }]}>

@@ -7,24 +7,19 @@ export const GET: APIRoute = () => {
 > ${SITE.description}
 
 ## Fatos
-- Fundação: ${SITE.foundingYear}
-- Localização: ${SITE.address.city}, ${SITE.address.region}, Brasil — atendimento remoto
+${SITE.foundingYear ? `- Fundação: ${SITE.foundingYear}\n` : ''}- Atendimento remoto${SITE.address.city ? ` a partir de ${SITE.address.city}/${SITE.address.region}` : ''}
 - Áreas atendidas: ${SITE.areaServed.join(', ')}
 ${STATS.map((s) => `- ${s.label}: ${s.value}`).join('\n')}
 
 ## Serviços
 ${SERVICES.map((s) => `- [${s.name}](${SITE.url}/servicos/${s.slug}/): ${s.short}`).join('\n')}
 
-## Cases
-${CASES.map((c) => `- ${c.title} (${c.category}): ${c.text} Resultado: ${c.result}.`).join('\n')}
-
+${CASES.length ? `## Cases\n${CASES.map((c) => `- ${c.title} (${c.category}): ${c.text} Resultado: ${c.result}.`).join('\n')}\n` : ''}
 ## Perguntas frequentes
 ${FAQ.map((f) => `- ${f.q} ${f.a}`).join('\n')}
 
 ## Contato
-- E-mail: ${SITE.email}
-- WhatsApp: ${SITE.whatsappDisplay}
-- Página de contato: ${SITE.url}/contato/
+${SITE.email ? `- E-mail: ${SITE.email}\n` : ''}${SITE.whatsappDisplay ? `- WhatsApp: ${SITE.whatsappDisplay}\n` : ''}- Página de contato: ${SITE.url}/contato/
 `;
   return new Response(t, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

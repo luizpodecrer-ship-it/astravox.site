@@ -6,7 +6,7 @@ import Logo from '../components/Logo.astro';
 import Mock from '../components/Mock.astro';
 import FAQ from '../components/FAQ.astro';
 import CTA from '../components/CTA.astro';
-import { SITE, STATS, SERVICES, INDUSTRIES, CASES, PROCESS, TESTIMONIALS, FAQ as FAQS, whatsappLink } from '../data/site';
+import { SITE, STATS, SERVICES, INDUSTRIES, CASES, PROCESS, TESTIMONIALS, FAQ as FAQS, whatsappLink, hasWhatsapp } from '../data/site';
 
 const title = 'Astravox | Agência de Criação de Sites, Apps e IA';
 const description = 'A Astravox cria sites, aplicativos, plataformas SaaS e soluções com inteligência artificial para empresas que querem crescer. Fale com a gente.';
@@ -46,8 +46,8 @@ const schema = [
         <div class="hero__cta-box">
           <p>Sites, Apps, Plataformas SaaS e Inteligência Artificial.</p>
           <div class="hero__ctas">
-            <a class="btn btn--accent" href="/cases/">Ver projetos <Icon name="arrow" class="arrow" /></a>
-            <a class="btn btn--light avatar-btn" href={whatsappLink()} target="_blank" rel="noopener"><span class="av"><Logo variant="symbol" /></span> Falar com a gente</a>
+            <a class="btn btn--accent" href={CASES.length ? '/cases/' : '/servicos/'}>{CASES.length ? 'Ver projetos' : 'Ver serviços'} <Icon name="arrow" class="arrow" /></a>
+            <a class="btn btn--light avatar-btn" href={hasWhatsapp() ? whatsappLink() : '/contato/'} {...(hasWhatsapp() && { target: '_blank', rel: 'noopener' })}><span class="av"><Logo variant="symbol" /></span> Falar com a gente</a>
           </div>
         </div>
       </div>
@@ -76,6 +76,7 @@ const schema = [
   </section>
 
   <!-- NÚMEROS -->
+  {STATS.length > 0 && (
   <section class="section" style="padding-top:0" aria-labelledby="stats-title">
     <div class="wrap">
       <span class="tag" data-reveal>Em números</span>
@@ -91,6 +92,7 @@ const schema = [
       </div>
     </div>
   </section>
+  )}
 
   <!-- SERVIÇOS -->
   <section class="dark-shell" aria-labelledby="svc-title">
@@ -154,6 +156,7 @@ const schema = [
   </section>
 
   <!-- CASES -->
+  {CASES.length > 0 && (
   <section class="section" style="padding-top:0" aria-labelledby="work-title">
     <div class="wrap">
       <div class="sec-head">
@@ -182,6 +185,7 @@ const schema = [
       </div>
     </div>
   </section>
+  )}
 
   <!-- PROCESSO -->
   <section class="soft-shell" aria-labelledby="proc-title">
@@ -215,6 +219,7 @@ const schema = [
   <FAQ items={FAQS} />
 
   <!-- DEPOIMENTOS -->
+  {TESTIMONIALS.length > 0 && (
   <section class="soft-shell" aria-labelledby="t-title">
     <div class="soft section">
       <div class="wrap">
@@ -242,6 +247,7 @@ const schema = [
       </div>
     </div>
   </section>
+  )}
 
   <div style="height:clamp(60px,8vw,110px)"></div>
   <CTA />

@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import { NAV, SITE, whatsappLink } from '../data/site';
+import { MENU as NAV, SITE, whatsappLink, hasWhatsapp } from '../data/site';
 interface Props { variant?: 'dark' | 'light' }
 const { variant = 'dark' } = Astro.props;
 const path = Astro.url.pathname;
@@ -26,6 +26,6 @@ const path = Astro.url.pathname;
   </ul>
   <div class="mm-foot">
     <a class="btn btn--accent btn--block" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
-    <a class="btn btn--ghost-dark btn--block" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>
+    {hasWhatsapp() && <a class="btn btn--ghost-dark btn--block" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>}
   </div>
 </div>

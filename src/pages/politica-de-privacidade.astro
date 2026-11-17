@@ -16,7 +16,7 @@ import { SITE } from '../data/site';
       <h2>Cookies</h2>
       <p>Usamos o Google Analytics apenas após o seu consentimento no aviso de cookies. Você pode mudar de ideia a qualquer momento limpando os dados do site no navegador.</p>
       <h2>Seus direitos</h2>
-      <p>Você pode solicitar acesso, correção ou exclusão dos seus dados pelo e-mail <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+      <p>Você pode solicitar acesso, correção ou exclusão dos seus dados {SITE.email ? <>pelo e-mail <a href={`mailto:${SITE.email}`}>{SITE.email}</a></> : <>pela nossa <a href="/contato/">página de contato</a></>}.</p>
       <p class="muted" style="margin-top:30px;font-size:14px">Última atualização: {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}.</p>
     </div>
   </section>

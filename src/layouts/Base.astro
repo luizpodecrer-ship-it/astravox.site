@@ -6,7 +6,7 @@ import geistWoff2 from '@fontsource-variable/geist/files/geist-latin-wght-normal
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
-import { SITE, whatsappLink } from '../data/site';
+import { SITE, whatsappLink, hasWhatsapp } from '../data/site';
 
 interface Props {
   /** <title>: até ~60 caracteres, palavra-chave principal primeiro */
@@ -39,20 +39,20 @@ const graph: Record<string, unknown>[] = [
     logo: { '@type': 'ImageObject', url: `${SITE.url}/logo-512.png`, width: 512, height: 512 },
     image: ogImage,
     description: SITE.description,
-    foundingDate: String(SITE.foundingYear),
-    email: SITE.email,
-    telephone: SITE.phone,
+    ...(SITE.foundingYear && { foundingDate: String(SITE.foundingYear) }),
+    ...(SITE.email && { email: SITE.email }),
+    ...(SITE.phone && { telephone: SITE.phone }),
     address: {
       '@type': 'PostalAddress',
       ...(SITE.address.street && { streetAddress: SITE.address.street }),
-      addressLocality: SITE.address.city,
-      addressRegion: SITE.address.region,
+      ...(SITE.address.city && { addressLocality: SITE.address.city }),
+      ...(SITE.address.region && { addressRegion: SITE.address.region }),
       ...(SITE.address.postalCode && { postalCode: SITE.address.postalCode }),
       addressCountry: SITE.address.country,
     },
     areaServed: SITE.areaServed,
     knowsAbout: ['Criação de sites', 'Desenvolvimento de aplicativos', 'SaaS', 'Dashboards', 'Inteligência artificial', 'UX/UI design', 'SEO técnico', 'Design system'],
-    contactPoint: { '@type': 'ContactPoint', contactType: 'sales', email: SITE.email, telephone: SITE.phone, availableLanguage: ['Portuguese', 'English'] },
+    contactPoint: { '@type': 'ContactPoint', contactType: 'sales', url: `${SITE.url}/contato/`, ...(SITE.email && { email: SITE.email }), ...(SITE.phone && { telephone: SITE.phone }), availableLanguage: ['Portuguese'] },
     ...(sameAs.length && { sameAs }),
   },
   {
@@ -135,9 +135,11 @@ const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': grap
     </main>
     <Footer />
 
-    <a class="wa-float" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Conversar no WhatsApp">
-      <Icon name="wa" />
-    </a>
+    {hasWhatsapp() && (
+      <a class="wa-float" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Conversar no WhatsApp">
+        <Icon name="wa" />
+      </a>
+    )}
 
     <div class="cookie" id="cookie" role="dialog" aria-labelledby="cookie-title" aria-live="polite">
       <h2 id="cookie-title">Cookies e métricas</h2>

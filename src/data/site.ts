@@ -1,36 +1,37 @@
 /**
  * Fonte única de dados do site da Astravox.
- * Tudo marcado com TODO é provisório: troque pelos dados reais antes de publicar.
+ * Campo vazio = o site esconde o item automaticamente. Nunca preencha com dado inventado:
+ * tudo aqui é publicado e lido pelo Google.
  * Estes valores alimentam as páginas, as meta tags, o JSON-LD (Google), o sitemap e o llms.txt.
  */
 
 export const SITE = {
   name: 'Astravox',
-  legalName: 'Astravox Tecnologia LTDA', // TODO: razão social
+  legalName: 'Astravox Inteligência Digital',
   url: 'https://astravox.com.br', // domínio principal (sem barra no final)
   locale: 'pt_BR',
   lang: 'pt-BR',
   tagline: 'Agência digital de produtos, sites e IA',
   description:
     'A Astravox é uma agência digital que cria sites, apps, plataformas SaaS e soluções com IA para empresas que querem crescer com tecnologia. Do design ao código, com foco em resultado.',
-  foundingYear: 2022, // TODO
-  email: 'contato@astravox.com.br', // TODO
-  whatsapp: '5511999999999', // TODO: só números, com DDI 55 + DDD
-  whatsappDisplay: '+55 (11) 99999-9999', // TODO
-  phone: '+55-11-99999-9999', // TODO (formato E.164 com hifens, usado no schema)
+  foundingYear: null as number | null, // TODO: ano de fundação
+  email: '', // TODO: e-mail de contato
+  whatsapp: '5565998113738', // só números, com DDI 55 + DDD
+  whatsappDisplay: '+55 (65) 99811-3738',
+  phone: '+55-65-99811-3738', // usado no schema (Google)
   address: {
     street: '', // TODO (opcional; deixe vazio se atende 100% remoto)
-    city: 'São Paulo', // TODO
-    region: 'SP', // TODO
+    city: 'Cuiabá',
+    region: 'MT',
     postalCode: '', // TODO
     country: 'BR',
   },
-  areaServed: ['Brasil', 'Portugal', 'Estados Unidos'], // TODO
+  areaServed: ['Brasil'], // TODO: inclua outros países se atender
   responseTime: 'Respondemos em até 1 dia útil',
   calendarUrl: '', // TODO: link do Calendly/Cal.com, se tiver
   social: {
-    instagram: 'https://www.instagram.com/astravox', // TODO
-    linkedin: 'https://www.linkedin.com/company/astravox', // TODO
+    instagram: '', // TODO
+    linkedin: '', // TODO
     behance: '', // TODO
     youtube: '', // TODO
   },
@@ -40,23 +41,21 @@ export const SITE = {
   gaMeasurementId: '', // TODO
 };
 
+export const hasWhatsapp = () => SITE.whatsapp.length >= 12;
+
+export const NAV_CASES = { label: 'Cases', href: '/cases/' };
+
 export const whatsappLink = (msg = 'Olá, Astravox! Quero conversar sobre um projeto.') =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(msg)}`;
 
 export const NAV = [
   { label: 'Serviços', href: '/servicos/' },
-  { label: 'Cases', href: '/cases/' },
   { label: 'Sobre', href: '/sobre/' },
   { label: 'Contato', href: '/contato/' },
 ];
 
-// TODO: números reais
-export const STATS = [
-  { value: '120+', label: 'Projetos entregues', detail: 'Sites, apps, plataformas e automações para empresas de vários setores.' },
-  { value: '40+', label: 'Clientes atendidos', detail: 'De startups em fase de validação a empresas consolidadas.' },
-  { value: '8', label: 'Estados e países', detail: 'Atendimento remoto com reuniões no seu fuso horário.' },
-  { value: '4,9', label: 'Nota média', detail: 'Avaliação média dos clientes nas plataformas em que estamos.' },
-];
+// TODO: números reais (ex.: { value: '50+', label: 'Projetos entregues', detail: '...' }). Vazio = seção escondida.
+export const STATS: { value: string; label: string; detail: string }[] = [];
 
 export type Service = {
   slug: string;
@@ -222,13 +221,8 @@ export const INDUSTRIES = [
   { name: 'Varejo & Serviços', badge: 'Core', text: 'Sites e apps que transformam visitas em pedidos e agendamentos.', tags: ['E-commerce', 'Delivery', 'Agendamento'] },
 ];
 
-// TODO: cases reais (troque título, cliente, descrição, categoria e imagem)
-export const CASES = [
-  { title: 'Plataforma de agendamento para clínicas', client: 'Cliente Saúde', category: 'SaaS · Saúde', text: 'Agenda inteligente com confirmação por WhatsApp e lembretes automáticos.', result: '-38% de faltas', hue: 150 },
-  { title: 'Assistente de IA para atendimento', client: 'Cliente Varejo', category: 'IA · Atendimento', text: 'Agente de IA que responde dúvidas e encaminha pedidos para o time humano.', result: '70% resolvido sem humano', hue: 75 },
-  { title: 'Dashboard financeiro B2B', client: 'Cliente Fintech', category: 'Dashboard · Finanças', text: 'Painel de fluxo de caixa e conciliação para pequenas empresas.', result: '3× mais ativação', hue: 185 },
-  { title: 'Site institucional e landing pages', client: 'Cliente Serviços', category: 'Site · SEO', text: 'Novo site com SEO técnico e páginas por serviço e por cidade.', result: '+210% tráfego orgânico', hue: 95 },
-];
+// TODO: cases reais. Vazio = seção e página de cases escondidas.
+export const CASES: { title: string; client: string; category: string; text: string; result: string; hue: number }[] = [];
 
 export const PROCESS = [
   { step: '01', title: 'Conversa inicial', text: 'Uma chamada gratuita de 20 minutos para entender seu objetivo, público e prazo.' },
@@ -238,13 +232,8 @@ export const PROCESS = [
   { step: '05', title: 'Lançamento e evolução', text: 'Publicação, métricas e um plano de melhorias contínuas.' },
 ];
 
-// TODO: depoimentos reais (nome, cargo e empresa com autorização)
-export const TESTIMONIALS = [
-  { quote: 'A Astravox entendeu o nosso negócio rápido e entregou um produto que os clientes elogiam desde a primeira semana.', name: 'Nome do Cliente', role: 'CEO, Empresa', initials: 'NC' },
-  { quote: 'Comunicação clara, prazos cumpridos e um design muito acima do que esperávamos.', name: 'Nome do Cliente', role: 'Head de Produto, Empresa', initials: 'NC' },
-  { quote: 'O novo site triplicou os contatos que chegam pelo Google em poucos meses.', name: 'Nome do Cliente', role: 'Fundadora, Empresa', initials: 'NC' },
-  { quote: 'O assistente de IA tirou do nosso time as perguntas repetitivas. Hoje focamos no que importa.', name: 'Nome do Cliente', role: 'Diretor de Operações, Empresa', initials: 'NC' },
-];
+// TODO: depoimentos reais, com autorização. Vazio = seção escondida.
+export const TESTIMONIALS: { quote: string; name: string; role: string; initials: string }[] = [];
 
 export const FAQ = [
   { q: 'O que a Astravox faz?', a: 'A Astravox é uma agência digital que cria sites, aplicativos, plataformas SaaS, dashboards e soluções com inteligência artificial. Cuidamos da estratégia, do design e do desenvolvimento.' },
@@ -253,3 +242,6 @@ export const FAQ = [
   { q: 'O site já sai preparado para aparecer no Google?', a: 'Sim. Todo projeto web sai com SEO técnico: títulos e descrições por página, sitemap, dados estruturados (schema.org), URLs amigáveis e alto desempenho no Core Web Vitals.' },
   { q: 'O código e os arquivos ficam comigo?', a: 'Sim. Ao final do projeto você é dono do código, dos arquivos de design e de todos os acessos.' },
 ];
+
+/** Menu: "Cases" só aparece quando houver cases reais cadastrados. */
+export const MENU = CASES.length ? [NAV[0], NAV_CASES, ...NAV.slice(1)] : NAV;

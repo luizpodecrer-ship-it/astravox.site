@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { SITE } from './src/data/site.ts';
+import { SITE, CASES } from './src/data/site.ts';
 
 export default defineConfig({
   site: SITE.url,
@@ -10,7 +10,7 @@ export default defineConfig({
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404'),
+      filter: (page) => !page.includes('/404') && (CASES.length > 0 || !page.includes('/cases/')),
       serialize(item) {
         item.lastmod = new Date().toISOString();
         if (item.url === SITE.url + '/') item.priority = 1.0;

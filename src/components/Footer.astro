@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import { SITE, SERVICES, NAV, whatsappLink } from '../data/site';
+import { SITE, SERVICES, MENU as NAV, whatsappLink, hasWhatsapp } from '../data/site';
 const year = new Date().getFullYear();
 const socials = [
   ['Instagram', SITE.social.instagram], ['LinkedIn', SITE.social.linkedin],
@@ -21,8 +21,9 @@ const socials = [
       <div>
         <p class="footer__claim">Ideias viram produto.<br />Produto vira resultado.</p>
         <div class="contact-box">
-          <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>
-          <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>
+          {SITE.email && <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>}
+          {hasWhatsapp() && <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>}
+          <a href="/contato/"><span class="mono">Formulário</span><span>Fale com a Astravox →</span></a>
         </div>
       </div>
       <div>
@@ -38,15 +39,17 @@ const socials = [
           {NAV.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
         </ul>
       </div>
-      <div>
-        <h3>Redes</h3>
-        <ul role="list">
-          {socials.map(([n, u]) => <li><a href={u} target="_blank" rel="noopener me">{n}</a></li>)}
-        </ul>
-      </div>
+      {socials.length > 0 && (
+        <div>
+          <h3>Redes</h3>
+          <ul role="list">
+            {socials.map(([n, u]) => <li><a href={u} target="_blank" rel="noopener me">{n}</a></li>)}
+          </ul>
+        </div>
+      )}
     </div>
     <div class="footer__bottom">
-      <span>© {year} {SITE.legalName}. {SITE.address.city} · {SITE.address.region} · Brasil</span>
+      <span>© {year} {SITE.legalName}. {[SITE.address.city, SITE.address.region, 'Brasil'].filter(Boolean).join(' · ')}</span>
       <nav aria-label="Legal">
         <a href="/politica-de-privacidade/">Privacidade</a>
         <a href="/sitemap-index.xml">Sitemap</a>

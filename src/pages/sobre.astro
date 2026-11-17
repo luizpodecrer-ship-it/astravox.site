@@ -9,20 +9,20 @@ const values = [
   ['Tecnologia que dura', 'Código limpo e documentado, que sua equipe consegue manter e evoluir.'],
 ];
 ---
-<Base title="Sobre a Astravox | Agência Digital de Produtos e IA" description={`Conheça a Astravox: agência digital fundada em ${SITE.foundingYear} que une estratégia, design, desenvolvimento e inteligência artificial.`} headerVariant="light" breadcrumb={[{ name: 'Sobre', path: '/sobre/' }]}>
+<Base title="Sobre a Astravox | Agência Digital de Produtos e IA" description="Conheça a Astravox: agência digital que une estratégia, design, desenvolvimento e inteligência artificial para criar produtos digitais que geram resultado." headerVariant="light" breadcrumb={[{ name: 'Sobre', path: '/sobre/' }]}>
   <section class="page-hero">
     <div class="wrap">
       <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Sobre</li></ol>
       <span class="tag">Sobre nós</span>
       <h1 class="display" data-split>A estrela que dá<br />voz às suas ideias.</h1>
-      <p class="lead" data-reveal>Astra é estrela; vox é voz. A Astravox nasceu em {SITE.foundingYear} para ajudar empresas a transformar ideias em produtos digitais que as pessoas entendem e usam — unindo estratégia, design, código e inteligência artificial.</p>
+      <p class="lead" data-reveal>Astra é estrela; vox é voz. A Astravox existe para ajudar empresas a transformar ideias em produtos digitais que as pessoas entendem e usam — unindo estratégia, design, código e inteligência artificial.</p>
     </div>
   </section>
-  <section class="section" style="padding-top:0">
+  {STATS.length > 0 && <section class="section" style="padding-top:0">
     <div class="wrap stats">
       {STATS.map((s) => <div class="stat" data-reveal><p class="stat__value" data-count={s.value}>{s.value}</p><h2 class="h3" style="margin-top:22px;font-size:19px">{s.label}</h2><p>{s.detail}</p></div>)}
     </div>
-  </section>
+  </section>}
   <section class="soft-shell">
     <div class="soft section">
       <div class="wrap">

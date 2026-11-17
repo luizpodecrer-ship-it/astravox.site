@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { SITE, SERVICES, whatsappLink } from '../data/site';
+import { SITE, SERVICES, whatsappLink, hasWhatsapp } from '../data/site';
 const schema = [{ '@type': 'ContactPage', name: 'Contato — Astravox', url: `${SITE.url}/contato/` }];
 ---
 <Base title="Contato | Astravox — Vamos Criar Seu Projeto" description={`Fale com a Astravox e comece seu projeto de site, app, SaaS ou projeto com IA. ${SITE.responseTime}.`} schema={schema} headerVariant="light" breadcrumb={[{ name: 'Contato', path: '/contato/' }]}>
@@ -17,11 +17,11 @@ const schema = [{ '@type': 'ContactPage', name: 'Contato — Astravox', url: `${
     <div class="wrap two-col">
       <aside>
         <div class="contact-box" style="margin-top:0">
-          <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>
-          <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>
+          {hasWhatsapp() && <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>}
+          {SITE.email && <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>}
           {SITE.calendarUrl && <a href={SITE.calendarUrl} target="_blank" rel="noopener"><span class="mono">Agenda</span><span>Marcar uma conversa</span></a>}
         </div>
-        <p class="muted" style="margin-top:20px;font-size:14px">{SITE.address.city} · {SITE.address.region} — atendimento remoto para todo o Brasil e exterior.</p>
+        <p class="muted" style="margin-top:20px;font-size:14px">{[SITE.address.city, SITE.address.region].filter(Boolean).join(' · ')}{SITE.address.city ? ' — ' : ''}Atendimento remoto para todo o Brasil.</p>
       </aside>
       <form class="form" id="contact-form" data-wa={SITE.whatsapp} novalidate>
         <div class="row">

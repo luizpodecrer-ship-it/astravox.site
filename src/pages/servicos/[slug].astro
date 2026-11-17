@@ -4,7 +4,7 @@ import Icon from '../../components/Icon.astro';
 import Mock from '../../components/Mock.astro';
 import FAQ from '../../components/FAQ.astro';
 import CTA from '../../components/CTA.astro';
-import { SERVICES, SITE, whatsappLink, type Service } from '../../data/site';
+import { SERVICES, SITE, whatsappLink, hasWhatsapp, type Service } from '../../data/site';
 
 export function getStaticPaths() {
   const kinds = ['site', 'phone', 'dash', 'chat', 'ux', 'brand'];
@@ -38,7 +38,7 @@ const schema = [
       <p class="lead" data-reveal style="--d:.1s">{s.intro}</p>
       <div class="hero__ctas" style="margin-top:34px" data-reveal>
         <a class="btn btn--accent" href="/contato/">Iniciar um projeto <Icon name="arrow" class="arrow" /></a>
-        <a class="btn btn--ghost" href={whatsappLink(`Olá! Quero saber mais sobre ${s.name}.`)} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>
+        {hasWhatsapp() && <a class="btn btn--ghost" href={whatsappLink(`Olá! Quero saber mais sobre ${s.name}.`)} target="_blank" rel="noopener"><Icon name="wa" /> WhatsApp</a>}
       </div>
     </div>
   </section>
