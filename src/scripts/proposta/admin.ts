@@ -110,13 +110,15 @@ async function loadList() {
       copy.addEventListener('click', () => copyLink(p.id, p.status));
       const dup = h('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Duplicar');
       dup.addEventListener('click', () => duplicate(p.id));
+      const ver = h('button', { class: 'btn btn--ghost btn--sm', type: 'button', title: 'Ver a proposta como o cliente vê' }, '👁 Visualizar');
+      ver.addEventListener('click', () => openViewerFor(p.id).catch(() => showToast('Não foi possível abrir a proposta')));
       const edit = h('a', { class: 'btn btn--sm', href: `/propostas/?id=${p.id}` }, 'Editar');
       edit.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
       const title = h('a', { href: `/propostas/?id=${p.id}` }, p.titulo || 'Sem título');
       title.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
       return h('article', { class: 'ad-card' },
         h('h2', {}, title),
-        h('div', { class: 'ad-card__actions' }, edit, copy, dup),
+        h('div', { class: 'ad-card__actions' }, ver, edit, copy, dup),
         h('div', { class: 'ad-card__meta' },
           h('span', { class: `ad-pill ad-pill--${p.status}` }, STATUS[p.status]),
           [p.cliente.nome, p.cliente.empresa].filter(Boolean).join(' · ') || 'Sem cliente',
@@ -642,16 +644,43 @@ $('delete').addEventListener('click', async () => {
 /* ---------- Visualizar (tela cheia, antes de salvar) ---------- */
 const viewer = $('viewer');
 let lastFocus: HTMLElement | null = null;
-function openViewer() {
-  if (!current) return;
+let viewerId = ''; // proposta aberta pela lista (fora do editor)
+function showViewer(p: Prop) {
   lastFocus = document.activeElement as HTMLElement | null;
-  $('viewer-page').replaceChildren(renderProposta(current, { interativo: false }));
-  updateViewerState();
+  $('viewer-page').replaceChildren(renderProposta(p, { interativo: false }));
   viewer.hidden = false;
   document.body.classList.add('has-viewer');
   $('viewer-page').scrollTop = 0;
   $('viewer-close').focus();
 }
+/** Do editor: mostra o que está na tela, mesmo antes de salvar. */
+function openViewer() {
+  if (!current) return;
+  viewerId = '';
+  $('viewer-edit').hidden = true;
+  $('viewer-open').hidden = true;
+  updateViewerState();
+  showViewer(current);
+}
+
+/** Da lista: abre a versão salva, como o cliente vê. */
+async function openViewerFor(id: string) {
+  const p = await api<Prop>(`/api/admin/propostas/${id}`);
+  viewerId = id;
+  const st = $('viewer-state');
+  st.classList.remove('is-dirty');
+  st.textContent = p.aceite
+    ? `✓ Aceita por ${p.aceite.nome} em ${fmtDate(p.aceite.em)}`
+    : p.status === 'rascunho' ? '● Rascunho: o cliente ainda não consegue abrir o link' : '✓ É isso que o cliente vê';
+  ($('viewer-save') as HTMLButtonElement).hidden = true;
+  $('viewer-edit').hidden = false;
+  const open = $<HTMLAnchorElement>('viewer-open');
+  open.href = `/p/${id}`;
+  open.hidden = false;
+  showViewer(p);
+}
+$('viewer-edit').addEventListener('click', () => { const id = viewerId; closeViewer(); if (id) go(id); });
+
 function closeViewer() {
   viewer.hidden = true;
   document.body.classList.remove('has-viewer');
