@@ -10,7 +10,8 @@ export type Valor = { descricao: string; valor: number };
 export type Proposta = {
   id: string;
   status: 'rascunho' | 'enviada' | 'aceita' | 'recusada';
-  cliente: { nome: string; empresa: string };
+  cliente: { nome: string; empresa: string; whatsapp: string; email: string };
+  produtos: string[]; // ids do catálogo (src/data/produtos.ts)
   titulo: string;
   subtitulo: string;
   data: string; // AAAA-MM-DD
@@ -48,7 +49,13 @@ export function sanitize(input: any, base: Proposta): Proposta {
   return {
     ...base,
     status,
-    cliente: { nome: str(input?.cliente?.nome, 120), empresa: str(input?.cliente?.empresa, 120) },
+    cliente: {
+      nome: str(input?.cliente?.nome, 120),
+      empresa: str(input?.cliente?.empresa, 120),
+      whatsapp: str(input?.cliente?.whatsapp, 20).replace(/\D/g, ''),
+      email: str(input?.cliente?.email, 160).trim(),
+    },
+    produtos: list(input?.produtos, (x) => str(x, 40).replace(/[^a-z0-9-]/g, ''), 12).filter(Boolean),
     titulo: str(input?.titulo, 160),
     subtitulo: str(input?.subtitulo, 300),
     data: /^\d{4}-\d{2}-\d{2}$/.test(input?.data) ? input.data : base.data,
@@ -75,8 +82,9 @@ export function blank(): Proposta {
   return {
     id: newId(),
     status: 'rascunho',
-    cliente: { nome: '', empresa: '' },
-    titulo: 'Proposta de projeto',
+    cliente: { nome: '', empresa: '', whatsapp: '', email: '' },
+    produtos: [],
+    titulo: 'Proposta comercial',
     subtitulo: '',
     data: now.toISOString().slice(0, 10),
     validadeDias: 15,
@@ -85,7 +93,7 @@ export function blank(): Proposta {
     escopo: [],
     cronograma: [],
     investimento: { itens: [], observacao: '', mostrarTotal: true },
-    pagamento: '',
+    pagamento: 'Entrada de 50% na aprovação e 50% na entrega final do projeto.',
     proximosPassos: 'Aprovando esta proposta, agendamos a reunião de kickoff e iniciamos a primeira etapa.',
     responsavel: { nome: 'Astravox', whatsapp: '5565998113738' },
     notasInternas: '',
@@ -95,8 +103,13 @@ export function blank(): Proposta {
   };
 }
 
-/** Versão pública: sem notas internas. */
+/** Versão pública: sem notas internas e sem o contato do cliente (caso o link seja repassado). */
 export function publicView(p: Proposta) {
   const { notasInternas, ...rest } = p;
-  return rest;
+  return { ...rest, cliente: { nome: p.cliente.nome, empresa: p.cliente.empresa } };
+}
+
+/** Propostas antigas (antes dos campos novos) continuam abrindo. */
+export function normalize(p: Proposta): Proposta {
+  return { ...p, cliente: { whatsapp: '', email: '', ...p.cliente }, produtos: p.produtos ?? [] };
 }

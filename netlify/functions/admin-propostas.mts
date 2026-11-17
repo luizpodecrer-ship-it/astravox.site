@@ -6,7 +6,7 @@
 //   DELETE /api/admin/propostas/:id      apaga
 import type { Config, Context } from '@netlify/functions';
 import { guard, json } from '../lib/auth.mts';
-import { blank, sanitize, store, viewsStore, validId, newId, type Proposta } from '../lib/propostas.mts';
+import { blank, sanitize, normalize, store, viewsStore, validId, type Proposta } from '../lib/propostas.mts';
 
 async function views(id: string) {
   const { blobs } = await viewsStore().list({ prefix: `${id}/` });
@@ -39,7 +39,7 @@ export default async (req: Request, context: Context) => {
         let p = blank();
         if (validId(body?.duplicarDe)) {
           const src = (await db.get(body.duplicarDe, { type: 'json' })) as Proposta | null;
-          if (src) p = { ...sanitize(src, p), id: p.id, status: 'rascunho', aceite: null, titulo: `${src.titulo} (cópia)`, criadaEm: p.criadaEm };
+          if (src) p = { ...sanitize(normalize(src), p), id: p.id, status: 'rascunho', aceite: null, titulo: `${src.titulo} (cópia)`, criadaEm: p.criadaEm };
         }
         await db.setJSON(p.id, p, { onlyIfNew: true });
         return json(p, 201);
@@ -48,8 +48,9 @@ export default async (req: Request, context: Context) => {
     }
 
     if (!validId(id)) return json({ error: 'not_found' }, 404);
-    const current = (await db.get(id, { type: 'json' })) as Proposta | null;
-    if (!current) return json({ error: 'not_found' }, 404);
+    const raw = (await db.get(id, { type: 'json' })) as Proposta | null;
+    if (!raw) return json({ error: 'not_found' }, 404);
+    const current = normalize(raw);
 
     if (req.method === 'GET') return json({ ...current, visualizacoes: await views(id) });
 

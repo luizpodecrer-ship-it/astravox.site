@@ -3,7 +3,7 @@
 //   POST /api/p/:id/aceite     { nome } registra o aceite
 import type { Config, Context } from '@netlify/functions';
 import { json, isAuthenticated } from '../lib/auth.mts';
-import { publicView, store, viewsStore, validId, type Proposta } from '../lib/propostas.mts';
+import { publicView, normalize, store, viewsStore, validId, type Proposta } from '../lib/propostas.mts';
 
 export default async (req: Request, context: Context) => {
   const id = context.params.id;
@@ -13,7 +13,7 @@ export default async (req: Request, context: Context) => {
   try {
     const entry = await db.getWithMetadata(id, { type: 'json' });
     if (entry === null) return json({ error: 'not_found' }, 404);
-    const p = entry.data as Proposta;
+    const p = normalize(entry.data as Proposta);
     // Rascunhos só abrem para quem está logado (prévia do próprio editor).
     if (p.status === 'rascunho' && !isAuthenticated(context)) return json({ error: 'not_found' }, 404);
 

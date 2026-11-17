@@ -35,8 +35,7 @@ import Logo from '../../components/Logo.astro';
         </div>
         <p class="ml-msg" id="login-msg" role="alert"></p>
         <div class="ml-submit">
-          <div class="ml-drop" aria-hidden="true"></div>
-          <button type="submit" class="ml-btn">Entrar</button>
+          <button type="submit" class="ml-btn"><span class="ml-btn__label">Entrar</span></button>
         </div>
       </form>
       <footer class="ml-foot"><a href="/">← Voltar ao site</a><span>Conexão segura</span></footer>
@@ -64,8 +63,8 @@ import Logo from '../../components/Logo.astro';
   <!-- EDITOR -->
   <main class="ad-editor" id="v-editor" hidden>
     <div class="ad-toolbar">
-      <button class="btn btn--ghost btn--sm" data-nav="list" type="button">← Voltar</button>
-      <label class="ad-status">Status
+      <button class="btn btn--ghost btn--sm" data-nav="list" type="button">← Propostas</button>
+      <label class="ad-status"><span>Status</span>
         <select id="f-status">
           <option value="rascunho">Rascunho (só você vê)</option>
           <option value="enviada">Enviada ao cliente</option>
@@ -74,9 +73,11 @@ import Logo from '../../components/Logo.astro';
         </select>
       </label>
       <div class="ad-toolbar__actions">
-        <button class="btn btn--accent btn--sm" id="copy-link" type="button">Copiar link do cliente</button>
-        <a class="btn btn--ghost btn--sm" id="share-wa" target="_blank" rel="noopener">Enviar no WhatsApp</a>
-        <a class="btn btn--ghost btn--sm" id="open-client" target="_blank" rel="noopener">Abrir como cliente ↗</a>
+        <button class="btn btn--sm ad-save-btn" id="save" type="button" title="Salvar (Ctrl/⌘ + S)">Salvar</button>
+        <button class="btn btn--accent btn--sm" id="send-wa" type="button">Enviar no WhatsApp</button>
+        <button class="btn btn--ghost btn--sm" id="send-mail" type="button">Enviar por e-mail</button>
+        <button class="btn btn--ghost btn--sm" id="copy-link" type="button">Copiar link</button>
+        <a class="btn btn--ghost btn--sm" id="open-client" target="_blank" rel="noopener" title="Abrir como o cliente vê">Ver ↗</a>
       </div>
       <div class="ad-tabs" role="tablist">
         <button type="button" role="tab" data-tab="form" aria-selected="true">Editar</button>
@@ -87,70 +88,71 @@ import Logo from '../../components/Logo.astro';
       <form class="ad-form" id="editor-form" autocomplete="off">
         <p class="ad-info" id="views-info"></p>
 
-        <fieldset><legend>Cliente</legend>
+        <section class="ad-step">
+          <h2><span>1</span> Cliente</h2>
           <div class="row2">
-            <div class="field"><label>Nome do cliente</label><input data-path="cliente.nome" placeholder="Ex.: Maria Souza" /></div>
-            <div class="field"><label>Empresa</label><input data-path="cliente.empresa" placeholder="Ex.: Clínica Bem-Estar" /></div>
+            <div class="field"><label for="c-nome">Nome</label><input id="c-nome" data-path="cliente.nome" placeholder="Maria Souza" /></div>
+            <div class="field"><label for="c-emp">Empresa</label><input id="c-emp" data-path="cliente.empresa" placeholder="Clínica Bem-Estar" /></div>
+            <div class="field"><label for="c-wa">WhatsApp</label><input id="c-wa" data-path="cliente.whatsapp" data-mask="phone" inputmode="tel" placeholder="(65) 99999-0000" /></div>
+            <div class="field"><label for="c-mail">E-mail</label><input id="c-mail" data-path="cliente.email" type="email" placeholder="maria@empresa.com.br" /></div>
           </div>
-        </fieldset>
+        </section>
 
-        <fieldset><legend>Capa</legend>
-          <div class="field"><label>Título</label><input data-path="titulo" /></div>
-          <div class="field"><label>Subtítulo</label><input data-path="subtitulo" placeholder="Ex.: Novo site institucional com SEO e captação de leads" /></div>
-          <div class="row2">
-            <div class="field"><label>Data</label><input type="date" data-path="data" /></div>
-            <div class="field"><label>Validade (dias)</label><input type="number" min="0" max="365" data-path="validadeDias" /></div>
-          </div>
-        </fieldset>
+        <section class="ad-step">
+          <h2><span>2</span> Produtos</h2>
+          <p class="ad-hint">Escolha um ou mais. Objetivos, escopo, cronograma e investimento são preenchidos e você ajusta.</p>
+          <div class="ad-products" id="products"></div>
+        </section>
 
-        <fieldset><legend>Introdução</legend>
-          <div class="field"><textarea data-path="introducao" rows="5" placeholder="Contexto do cliente e o que a proposta resolve. Deixe uma linha em branco para separar parágrafos."></textarea></div>
-        </fieldset>
-
-        <fieldset><legend>Objetivos</legend>
+        <section class="ad-step">
+          <h2><span>3</span> Objetivos</h2>
           <div class="ad-rows" data-list="objetivos"></div>
-          <button class="ad-add" type="button" data-add="objetivos">+ Objetivo</button>
-        </fieldset>
+          <div class="ad-suggest" id="suggestions"></div>
+          <button class="ad-add" type="button" data-add="objetivos">+ Escrever objetivo</button>
+        </section>
 
-        <fieldset><legend>Escopo</legend>
+        <section class="ad-step">
+          <h2><span>4</span> Escopo</h2>
           <div class="ad-rows" data-list="escopo"></div>
           <button class="ad-add" type="button" data-add="escopo">+ Item de escopo</button>
-        </fieldset>
+        </section>
 
-        <fieldset><legend>Cronograma</legend>
+        <section class="ad-step">
+          <h2><span>5</span> Cronograma</h2>
           <div class="ad-rows" data-list="cronograma"></div>
           <button class="ad-add" type="button" data-add="cronograma">+ Etapa</button>
-        </fieldset>
+        </section>
 
-        <fieldset><legend>Investimento</legend>
+        <section class="ad-step">
+          <h2><span>6</span> Investimento</h2>
           <div class="ad-rows" data-list="investimento.itens"></div>
           <button class="ad-add" type="button" data-add="investimento.itens">+ Item com valor</button>
-          <p class="ad-total" id="total"></p>
-          <label class="ad-check"><input type="checkbox" data-path="investimento.mostrarTotal" /> Mostrar total ao cliente</label>
-          <div class="field"><label>Observação</label><textarea data-path="investimento.observacao" rows="2" placeholder="Ex.: Valores não incluem hospedagem e domínio."></textarea></div>
-        </fieldset>
+          <div class="ad-total-row"><span class="ad-total" id="total"></span><label class="ad-check"><input type="checkbox" data-path="investimento.mostrarTotal" /> Mostrar total</label></div>
+        </section>
 
-        <fieldset><legend>Condições de pagamento</legend>
-          <div class="field"><textarea data-path="pagamento" rows="3" placeholder="Ex.: 50% na aprovação e 50% na entrega. Pix ou boleto."></textarea></div>
-        </fieldset>
-
-        <fieldset><legend>Próximos passos</legend>
-          <div class="field"><textarea data-path="proximosPassos" rows="3"></textarea></div>
-        </fieldset>
-
-        <fieldset><legend>Responsável</legend>
-          <div class="row2">
-            <div class="field"><label>Nome</label><input data-path="responsavel.nome" /></div>
-            <div class="field"><label>WhatsApp (só números, com 55 e DDD)</label><input data-path="responsavel.whatsapp" inputmode="numeric" /></div>
+        <details class="ad-more">
+          <summary>Textos e detalhes <small>título, introdução, pagamento, validade, notas</small></summary>
+          <div class="ad-more__body">
+            <div class="field"><label>Título</label><input data-path="titulo" /></div>
+            <div class="field"><label>Subtítulo</label><input data-path="subtitulo" /></div>
+            <div class="row2">
+              <div class="field"><label>Data</label><input type="date" data-path="data" /></div>
+              <div class="field"><label>Validade (dias)</label><input type="number" min="0" max="365" data-path="validadeDias" /></div>
+            </div>
+            <div class="field"><label>Introdução</label><textarea data-path="introducao" rows="4" placeholder="Contexto do cliente e o que a proposta resolve. Linha em branco separa parágrafos."></textarea></div>
+            <div class="field"><label>Observação do investimento</label><textarea data-path="investimento.observacao" rows="2"></textarea></div>
+            <div class="field"><label>Condições de pagamento</label><textarea data-path="pagamento" rows="2"></textarea></div>
+            <div class="field"><label>Próximos passos</label><textarea data-path="proximosPassos" rows="2"></textarea></div>
+            <div class="row2">
+              <div class="field"><label>Responsável</label><input data-path="responsavel.nome" /></div>
+              <div class="field"><label>WhatsApp da Astravox</label><input data-path="responsavel.whatsapp" data-mask="phone" inputmode="tel" /></div>
+            </div>
+            <div class="field ad-internal"><label>Notas internas (o cliente nunca vê)</label><textarea data-path="notasInternas" rows="2"></textarea></div>
           </div>
-        </fieldset>
-
-        <fieldset class="ad-internal"><legend>Notas internas <small>(o cliente nunca vê)</small></legend>
-          <div class="field"><textarea data-path="notasInternas" rows="3"></textarea></div>
-        </fieldset>
+        </details>
 
         <div class="ad-danger">
-          <button class="btn btn--ghost btn--sm" type="button" id="duplicate">Duplicar proposta</button>
+          <button class="btn btn--ghost btn--sm" type="button" id="duplicate">Duplicar</button>
           <button class="btn btn--ghost btn--sm ad-del" type="button" id="delete">Apagar proposta</button>
         </div>
       </form>
@@ -162,7 +164,7 @@ import Logo from '../../components/Logo.astro';
 </App>
 
 <style is:global>
-  body.app { background: var(--soft); }
+  body.app { background: var(--soft); overflow-x: clip; }
   [hidden] { display: none !important; }
   /* ---------- Login: mercúrio líquido ---------- */
   .ml { position: fixed; inset: 0; z-index: 30; background: #050505; color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -193,13 +195,23 @@ import Logo from '../../components/Logo.astro';
   .ml-glow { position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--lime); box-shadow: 0 0 15px var(--lime); transition: width .6s cubic-bezier(.2,1,.3,1); }
   .ml-group input:focus + .ml-glow { width: 100%; }
   .ml-msg { min-height: 1.2em; font-size: 14px; color: #ffb4a0; margin-top: -10px; }
-  .ml-submit { margin-top: 40px; position: relative; filter: url('#ml-gooey'); }
-  .ml-btn { position: relative; z-index: 2; width: 100%; background: #fff; color: #000; border: 0; padding: 20px 40px; font: inherit; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: letter-spacing .3s, background .3s; }
-  .ml-btn:hover { letter-spacing: 4px; background: var(--lime); }
-  .ml-btn:disabled { opacity: .7; cursor: wait; }
-  .ml-btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
-  .ml-drop { position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; background: #e0e0e0; transform: translate(-50%, -50%); z-index: 1; border-radius: 50px; transition: all .5s cubic-bezier(.175,.885,.32,1.275); }
-  .ml-submit:hover .ml-drop { transform: translate(-50%, -50%) scale(1.05, 1.2); background: var(--lime); }
+  .ml-submit { margin-top: 40px; }
+  /* Botão "Arrow Ring" (referência), cores invertidas para o fundo escuro */
+  .ml-btn {
+    --bink: var(--lime); --bsurf: #050505;
+    position: relative; isolation: isolate; width: 100%;
+    font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    padding: 16px 24px; border: 1px solid var(--bink); border-radius: 9999px;
+    background: transparent; color: var(--bink); cursor: pointer; white-space: nowrap;
+    transition: all .4s cubic-bezier(.22,1,.36,1);
+  }
+  .ml-btn__label { position: relative; z-index: 2; display: inline-block; transition: inherit; }
+  .ml-btn__label::after { content: " \2197"; display: inline-block; transition: transform .3s ease; }
+  .ml-btn:is(:hover, :focus-visible) { background: var(--bink); color: var(--bsurf); }
+  .ml-btn:is(:hover, :focus-visible) .ml-btn__label::after { transform: translate(3px, -3px); }
+  .ml-btn:focus-visible { outline: 2px solid var(--bink); outline-offset: 5px; }
+  .ml-btn:disabled { cursor: not-allowed; opacity: .5; }
+  @media (prefers-reduced-motion: reduce) { .ml-btn, .ml-btn * , .ml-btn *::after { transition-duration: .01ms !important; } }
   .ml-foot { margin-top: 40px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.5); }
   .ml-foot a { transition: color .3s; } .ml-foot a:hover { color: #fff; }
   .ml.is-shake .ml-box { animation: ml-shake .4s; }
@@ -248,19 +260,14 @@ import Logo from '../../components/Logo.astro';
   .ad-form .field label { font-size: 13px; font-weight: 500; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .ad-rows { display: grid; gap: 8px; }
-  .ad-row { display: grid; gap: 6px; padding: 10px; border-radius: 10px; background: var(--soft); position: relative; }
-  .ad-row__line { display: flex; gap: 6px; }
   .ad-row input, .ad-row textarea { font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; width: 100%; min-width: 0; }
+  .ad-row textarea { resize: none; overflow: hidden; line-height: 1.4; display: block; }
   .ad-row input:focus, .ad-row textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(209,255,43,.55); }
   .ad-row .money { max-width: 140px; text-align: right; }
-  .ad-row__tools { display: flex; gap: 4px; justify-content: flex-end; }
-  .ad-row__tools button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 13px; color: var(--muted); }
-  .ad-row__tools button:hover { color: var(--ink); border-color: var(--ink); }
   .ad-add { justify-self: start; font-size: 14px; font-weight: 500; padding: 7px 12px; border-radius: 999px; border: 1px dashed #bdbdc8; }
   .ad-add:hover { border-color: var(--ink); }
   .ad-total { font-size: 15px; font-weight: 500; }
   .ad-check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
-  .ad-internal { background: #fffbea; border-color: #f2e3a6 !important; }
   .ad-info { font-size: 13.5px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 10px 12px; }
   .ad-info:empty { display: none; }
   .ad-danger { display: flex; gap: 8px; justify-content: space-between; padding-top: 6px; }
@@ -277,6 +284,42 @@ import Logo from '../../components/Logo.astro';
   }
   .pv-toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 30px); opacity: 0; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; transition: all .4s var(--ease); pointer-events: none; z-index: 50; }
   .pv-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Editor simplificado ---------- */
+  .ad-step { display: grid; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .ad-step h2 { font-size: 17px; font-weight: 500; letter-spacing: -.02em; display: flex; align-items: center; gap: 10px; }
+  .ad-step h2 span { width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--lime); font-family: var(--mono); font-size: 12px; display: grid; place-items: center; }
+  .ad-hint { font-size: 13px; color: var(--muted); margin-top: -4px; }
+  .ad-products { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ad-chip { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; transition: all .2s; }
+  .ad-chip:hover { border-color: var(--ink); }
+  .ad-chip[aria-pressed='true'] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .ad-chip[aria-pressed='true']::before { content: '✓ '; color: var(--lime); }
+  .ad-suggest { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ad-suggest:empty { display: none; }
+  .ad-suggest button { font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px dashed #bdbdc8; background: #fff; color: #44444f; cursor: pointer; }
+  .ad-suggest button:hover { border-style: solid; border-color: var(--ink); color: var(--ink); }
+  .ad-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 6px; border-radius: 10px; background: var(--soft); align-items: start; }
+  .ad-row__fields { display: grid; gap: 6px; min-width: 0; }
+  .ad-row .short { max-width: 130px; }
+  .ad-row__tools { display: flex; gap: 2px; opacity: .35; transition: opacity .2s; }
+  .ad-row:hover .ad-row__tools, .ad-row:focus-within .ad-row__tools { opacity: 1; }
+  .ad-row__tools button { width: 26px; height: 32px; border: 0; background: none; border-radius: 6px; }
+  .ad-row__tools button:hover { background: #fff; }
+  .ad-total-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ad-more { border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+  .ad-more summary { cursor: pointer; padding: 14px 16px; font-weight: 500; list-style: none; display: flex; gap: 10px; align-items: baseline; }
+  .ad-more summary::-webkit-details-marker { display: none; }
+  .ad-more summary::before { content: '+'; font-family: var(--mono); color: var(--hot); }
+  .ad-more[open] summary::before { content: '−'; }
+  .ad-more summary small { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .ad-more__body { padding: 0 16px 16px; display: grid; gap: 10px; }
+  .ad-internal textarea { background: #fffbea; }
+  .ad-save-btn { --bg: var(--ink); --fg: #fff; }
+  .ad-save-btn.is-dirty { --bg: var(--ink); box-shadow: 0 0 0 3px var(--lime); }
+  .ad-save-btn.is-saved { --bg: #fff; --fg: var(--ink); border: 1px solid var(--line); }
+  .ad-status span { display: none; }
+  @media (min-width: 1300px) { .ad-status span { display: inline; } }
 </style>
 
 <script>

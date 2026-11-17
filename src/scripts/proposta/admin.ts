@@ -1,6 +1,8 @@
 // Painel de propostas: login, lista e editor com salvamento automático e prévia ao vivo.
 import { renderProposta, brl, h, type Proposta } from './render';
+import { PRODUTOS, type Produto } from '../../data/produtos';
 
+type Prop = Proposta & { cliente: Proposta['cliente'] & { whatsapp: string; email: string }; produtos: string[]; notasInternas: string };
 type Resumo = Pick<Proposta, 'id' | 'titulo' | 'cliente' | 'status' | 'atualizadaEm' | 'aceite'> & {
   visualizacoes: { total: number; ultima: string | null };
 };
@@ -138,26 +140,76 @@ async function duplicate(id: string) {
   go(p.id);
 }
 
+/* ================= ENVIO ================= */
+/** Número no formato do WhatsApp (com 55). */
+const waNumber = (digits: string) => {
+  const d = digits.replace(/\D/g, '');
+  if (!d) return '';
+  return d.startsWith('55') && d.length >= 12 ? d : `55${d}`;
+};
+/** (65) 99811-3738 para exibir no campo. */
+const fmtPhone = (digits: string) => {
+  let d = digits.replace(/\D/g, '');
+  if (d.startsWith('55') && d.length >= 12) d = d.slice(2);
+  if (d.length < 10) return d;
+  return `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+};
+
 async function copyLink(id: string, status: Proposta['status']) {
-  if (status === 'rascunho') {
+  if (current?.id === id) { if (!(await ensureReady())) return; }
+  else if (status === 'rascunho') {
     if (!confirm('Esta proposta ainda é um rascunho e o cliente não consegue abrir. Marcar como “Enviada” e copiar o link?')) return;
-    if (current?.id === id) { current.status = 'enviada'; ($('f-status') as HTMLSelectElement).value = 'enviada'; await saveNow(); }
-    else {
-      const p = await api<Proposta>(`/api/admin/propostas/${id}`);
-      await api(`/api/admin/propostas/${id}`, { method: 'PUT', body: JSON.stringify({ ...p, status: 'enviada' }) });
-    }
+    const p = await api<Prop>(`/api/admin/propostas/${id}`);
+    await api(`/api/admin/propostas/${id}`, { method: 'PUT', body: JSON.stringify({ ...p, status: 'enviada' }) });
   }
-  try { await navigator.clipboard.writeText(clientUrl(id)); showToast('Link copiado: cole no WhatsApp ou e-mail do cliente'); }
+  try { await navigator.clipboard.writeText(clientUrl(id)); showToast('Link copiado'); }
   catch { prompt('Copie o link do cliente:', clientUrl(id)); }
   if (!current) loadList();
 }
 
+/** Antes de enviar: salva o que estiver pendente e tira do rascunho. */
+async function ensureReady() {
+  if (!current) return false;
+  if (current.status === 'rascunho') {
+    if (!confirm('A proposta está como rascunho. Marcar como “Enviada” para o cliente conseguir abrir?')) return false;
+    current.status = 'enviada';
+    $<HTMLSelectElement>('f-status').value = 'enviada';
+    dirty = true;
+  }
+  if (dirty) await save();
+  return !dirty;
+}
+
+function mensagem() {
+  const nome = current!.cliente.nome.split(/[\s/]+/)[0];
+  return `Olá${nome ? `, ${nome}` : ''}! Segue a proposta da Astravox: ${clientUrl(current!.id)}\n\nVocê pode ver todos os detalhes e aprovar direto por esse link. Qualquer dúvida, estou à disposição.`;
+}
+
+$('send-wa').addEventListener('click', async () => {
+  if (!current || !(await ensureReady())) return;
+  const n = waNumber(current.cliente.whatsapp);
+  window.open(`https://wa.me/${n}?text=${encodeURIComponent(mensagem())}`, '_blank', 'noopener');
+  if (!n) showToast('Sem WhatsApp do cliente: escolha o contato no WhatsApp');
+});
+
+$('send-mail').addEventListener('click', async () => {
+  if (!current) return;
+  if (!current.cliente.email) { showToast('Preencha o e-mail do cliente'); $('c-mail').focus(); return; }
+  if (!(await ensureReady())) return;
+  const assunto = `Proposta Astravox: ${current.titulo}`;
+  location.href = `mailto:${encodeURIComponent(current.cliente.email)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem())}`;
+});
+
+$('copy-link').addEventListener('click', () => current && copyLink(current.id, current.status));
+
 /* ================= EDITOR ================= */
-let current: (Proposta & { visualizacoes?: Resumo['visualizacoes'] }) | null = null;
-let saveTimer: number | undefined;
-let saving = Promise.resolve();
+let current: (Prop & { visualizacoes?: Resumo['visualizacoes'] }) | null = null;
+let dirty = false;
+let saving: Promise<void> | null = null;
 const form = $<HTMLFormElement>('editor-form');
 const preview = $('preview');
+const saveBtn = $<HTMLButtonElement>('save');
+const backupKey = (id: string) => `ax-proposta-${id}`;
 
 const getPath = (obj: any, path: string) => path.split('.').reduce((o, k) => o?.[k], obj);
 function setPath(obj: any, path: string, value: unknown) {
@@ -166,13 +218,19 @@ function setPath(obj: any, path: string, value: unknown) {
   keys.reduce((o, k) => o[k], obj)[last] = value;
 }
 
-type ListDef = { blank: () => any; fields: { key?: string; placeholder: string; type?: 'text' | 'area' | 'money' }[] };
+type Field = { key?: string; placeholder: string; type?: 'text' | 'area' | 'money'; short?: boolean };
+type ListDef = { blank: () => any; fields: Field[] };
 const LISTS: Record<string, ListDef> = {
-  objetivos: { blank: () => '', fields: [{ placeholder: 'Ex.: Gerar mais contatos pelo Google' }] },
-  escopo: { blank: () => ({ titulo: '', descricao: '' }), fields: [{ key: 'titulo', placeholder: 'Título do item' }, { key: 'descricao', placeholder: 'Descrição (opcional)', type: 'area' }] },
-  cronograma: { blank: () => ({ titulo: '', prazo: '' }), fields: [{ key: 'titulo', placeholder: 'Etapa' }, { key: 'prazo', placeholder: 'Prazo (ex.: Semana 1–2)' }] },
-  'investimento.itens': { blank: () => ({ descricao: '', valor: 0 }), fields: [{ key: 'descricao', placeholder: 'Descrição' }, { key: 'valor', placeholder: 'R$ 0,00', type: 'money' }] },
+  objetivos: { blank: () => '', fields: [{ placeholder: 'Objetivo' }] },
+  escopo: { blank: () => ({ titulo: '', descricao: '' }), fields: [{ key: 'titulo', placeholder: 'Item' }, { key: 'descricao', placeholder: 'Descrição (opcional)', type: 'area' }] },
+  cronograma: { blank: () => ({ titulo: '', prazo: '' }), fields: [{ key: 'titulo', placeholder: 'Etapa' }, { key: 'prazo', placeholder: 'Prazo', short: true }] },
+  'investimento.itens': { blank: () => ({ descricao: '', valor: 0 }), fields: [{ key: 'descricao', placeholder: 'Descrição' }, { key: 'valor', placeholder: 'R$ 0,00', type: 'money', short: true }] },
 };
+
+function autoGrow(el: HTMLTextAreaElement) {
+  el.style.height = 'auto';
+  el.style.height = `${el.scrollHeight + 2}px`;
+}
 
 function renderList(path: string) {
   const def = LISTS[path];
@@ -181,27 +239,35 @@ function renderList(path: string) {
   wrap.replaceChildren(
     ...arr.map((item, i) => {
       const line = h('div', { class: 'ad-row__line' });
-      const extra: HTMLElement[] = [];
+      const fields = h('div', { class: 'ad-row__fields' }, line);
       for (const f of def.fields) {
         const value = f.key ? item[f.key] : item;
         let el: HTMLInputElement | HTMLTextAreaElement;
-        if (f.type === 'area') { el = h('textarea', { rows: '2', placeholder: f.placeholder }) as HTMLTextAreaElement; el.value = value ?? ''; }
-        else if (f.type === 'money') { el = h('input', { class: 'money', inputmode: 'decimal', placeholder: f.placeholder }) as HTMLInputElement; el.value = value ? String(value).replace('.', ',') : ''; }
-        else { el = h('input', { placeholder: f.placeholder }) as HTMLInputElement; el.value = value ?? ''; }
+        if (f.type === 'area') { el = h('textarea', { rows: '2', placeholder: f.placeholder, 'aria-label': f.placeholder }) as HTMLTextAreaElement; el.value = value ?? ''; fields.append(el); }
+        else {
+          el = f.short
+            ? (h('input', { placeholder: f.placeholder, 'aria-label': f.placeholder, class: 'short', inputmode: f.type === 'money' ? 'decimal' : undefined }) as HTMLInputElement)
+            : (h('textarea', { rows: '1', class: 'grow', placeholder: f.placeholder, 'aria-label': f.placeholder }) as HTMLTextAreaElement);
+          el.value = f.type === 'money' ? (value ? Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '') : value ?? '';
+          line.append(el);
+        }
         el.addEventListener('input', () => {
+          if (el instanceof HTMLTextAreaElement) autoGrow(el);
           let v: any = el.value;
-          if (f.type === 'money') { const n = parseFloat(v.replace(/\./g, '').replace(',', '.')); v = Number.isFinite(n) ? n : 0; }
+          if (f.type === 'money') { const n = parseFloat(v.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')); v = Number.isFinite(n) ? n : 0; }
           if (f.key) arr[i][f.key] = v; else arr[i] = v;
           changed();
         });
-        if (f.type === 'area') extra.push(el); else line.append(el);
       }
       const tools = h('div', { class: 'ad-row__tools' });
       const mk = (label: string, title: string, fn: () => void) => { const b = h('button', { type: 'button', title, 'aria-label': title }, label); b.addEventListener('click', fn); tools.append(b); };
-      mk('↑', 'Mover para cima', () => { if (i > 0) { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; renderList(path); changed(); } });
-      mk('↓', 'Mover para baixo', () => { if (i < arr.length - 1) { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; renderList(path); changed(); } });
-      mk('✕', 'Remover', () => { arr.splice(i, 1); renderList(path); changed(); });
-      return h('div', { class: 'ad-row' }, line, ...extra, tools);
+      if (arr.length > 1) {
+        mk('↑', 'Mover para cima', () => { if (i > 0) { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; renderList(path); changed(); } });
+        mk('↓', 'Mover para baixo', () => { if (i < arr.length - 1) { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; renderList(path); changed(); } });
+      }
+      mk('✕', 'Remover', () => { arr.splice(i, 1); renderList(path); if (path === 'objetivos') renderSuggestions(); changed(); });
+      requestAnimationFrame(() => fields.querySelectorAll<HTMLTextAreaElement>('textarea').forEach(autoGrow));
+      return h('div', { class: 'ad-row' }, fields, tools);
     }),
   );
 }
@@ -217,16 +283,77 @@ form.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((b) =>
   }),
 );
 
-form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-path]').forEach((el) =>
+/* ---------- Produtos ---------- */
+const DEFAULT_TITLES = ['', 'Proposta', 'Proposta comercial', 'Proposta de projeto'];
+const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+function addProduct(prod: Produto) {
+  const p = current!;
+  p.produtos.push(prod.id);
+  for (const o of prod.objetivos) if (!p.objetivos.some((x) => same(x, o))) p.objetivos.push(o);
+  for (const e of prod.escopo) if (!p.escopo.some((x) => same(x.titulo, e.titulo))) p.escopo.push({ ...e });
+  for (const c of prod.cronograma) if (!p.cronograma.some((x) => same(x.titulo, c.titulo))) p.cronograma.push({ ...c });
+  for (const v of prod.investimento) if (!p.investimento.itens.some((x) => same(x.descricao, v.descricao))) p.investimento.itens.push({ ...v });
+  if (prod.observacao && !p.investimento.observacao.trim()) p.investimento.observacao = prod.observacao;
+  if (DEFAULT_TITLES.includes(p.titulo.trim())) p.titulo = prod.titulo;
+  if (!p.subtitulo.trim()) p.subtitulo = prod.subtitulo;
+}
+
+/** Ao desmarcar, remove só o que veio do produto e não foi alterado (valores preenchidos ficam). */
+function removeProduct(prod: Produto) {
+  const p = current!;
+  p.produtos = p.produtos.filter((x) => x !== prod.id);
+  const others = PRODUTOS.filter((x) => p.produtos.includes(x.id));
+  const usedElsewhere = (fn: (o: Produto) => boolean) => others.some(fn);
+  p.objetivos = p.objetivos.filter((o) => !prod.objetivos.concat(prod.sugestoes).some((x) => same(x, o)) || usedElsewhere((op) => op.objetivos.some((x) => same(x, o))));
+  p.escopo = p.escopo.filter((e) => !prod.escopo.some((x) => same(x.titulo, e.titulo) && same(x.descricao, e.descricao)));
+  p.cronograma = p.cronograma.filter((c) => !prod.cronograma.some((x) => same(x.titulo, c.titulo) && same(x.prazo, c.prazo)));
+  p.investimento.itens = p.investimento.itens.filter((v) => v.valor > 0 || !prod.investimento.some((x) => same(x.descricao, v.descricao)));
+  if (prod.observacao && same(p.investimento.observacao, prod.observacao)) p.investimento.observacao = others.find((o) => o.observacao)?.observacao ?? '';
+  if (same(p.titulo, prod.titulo)) p.titulo = others[0]?.titulo ?? 'Proposta comercial';
+  if (same(p.subtitulo, prod.subtitulo)) p.subtitulo = others[0]?.subtitulo ?? '';
+}
+
+function renderProducts() {
+  $('products').replaceChildren(
+    ...PRODUTOS.map((prod) => {
+      const on = current!.produtos.includes(prod.id);
+      const b = h('button', { type: 'button', class: 'ad-chip', 'aria-pressed': String(on) }, prod.nome);
+      b.addEventListener('click', () => {
+        if (on) removeProduct(prod); else addProduct(prod);
+        fillForm();
+        changed();
+      });
+      return b;
+    }),
+  );
+}
+
+function renderSuggestions() {
+  const p = current!;
+  const pool = PRODUTOS.filter((x) => p.produtos.includes(x.id)).flatMap((x) => [...x.objetivos, ...x.sugestoes]);
+  const free = [...new Set(pool)].filter((o) => !p.objetivos.some((x) => same(x, o)));
+  $('suggestions').replaceChildren(
+    ...free.map((o) => {
+      const b = h('button', { type: 'button', title: 'Incluir objetivo' }, `+ ${o}`);
+      b.addEventListener('click', () => { p.objetivos.push(o); renderList('objetivos'); renderSuggestions(); changed(); });
+      return b;
+    }),
+  );
+}
+
+/* ---------- Campos simples ---------- */
+form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-path]').forEach((el) => {
   el.addEventListener('input', () => {
     const path = el.dataset.path!;
     let v: any = el instanceof HTMLInputElement && el.type === 'checkbox' ? el.checked : el.value;
     if (el instanceof HTMLInputElement && el.type === 'number') v = Number(v) || 0;
-    if (path === 'responsavel.whatsapp') v = String(v).replace(/\D/g, '');
+    if (el.dataset.mask === 'phone') v = waNumber(String(v));
     setPath(current, path, v);
     changed();
-  }),
-);
+  });
+  if (el.dataset.mask === 'phone') el.addEventListener('blur', () => { el.value = fmtPhone(getPath(current, el.dataset.path!) ?? ''); });
+});
 
 $('f-status').addEventListener('change', (e) => {
   if (!current) return;
@@ -239,25 +366,19 @@ function fillForm() {
   form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-path]').forEach((el) => {
     const v = getPath(current, el.dataset.path!);
     if (el instanceof HTMLInputElement && el.type === 'checkbox') el.checked = !!v;
-    else el.value = v ?? '';
+    else el.value = el.dataset.mask === 'phone' ? fmtPhone(v ?? '') : v ?? '';
   });
   const status = $<HTMLSelectElement>('f-status');
   status.value = current.status;
   status.disabled = !!current.aceite;
   Object.keys(LISTS).forEach(renderList);
+  renderProducts();
+  renderSuggestions();
   const v = current.visualizacoes;
   $('views-info').textContent = current.aceite
     ? `✓ Aceita por ${current.aceite.nome} em ${fmtDate(current.aceite.em)}.`
-    : v?.total ? `O cliente abriu esta proposta ${v.total}× (última em ${fmtDate(v.ultima!)}).` : current.status === 'rascunho' ? 'Rascunho: o link só abre para o cliente depois que o status for “Enviada”.' : 'O cliente ainda não abriu o link.';
-  updateLinks();
-}
-
-function updateLinks() {
-  if (!current) return;
+    : v?.total ? `O cliente abriu esta proposta ${v.total}× (última em ${fmtDate(v.ultima!)}).` : current.status === 'rascunho' ? 'Rascunho: ao enviar, a proposta passa para “Enviada” e o link abre para o cliente.' : 'Enviada. O cliente ainda não abriu o link.';
   ($('open-client') as HTMLAnchorElement).href = `/p/${current.id}`;
-  const nome = current.cliente.nome.split(' ')[0];
-  const msg = `Olá${nome ? `, ${nome}` : ''}! Segue a proposta da Astravox: ${clientUrl(current.id)}\nVocê pode ver e aprovar por esse link. Qualquer dúvida, é só chamar aqui.`;
-  ($('share-wa') as HTMLAnchorElement).href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
 
 function drawPreview() {
@@ -269,48 +390,86 @@ function drawPreview() {
   $('total').textContent = current.investimento.itens.length ? `Total: ${brl(total)}` : '';
 }
 
-function changed() {
-  drawPreview();
-  updateLinks();
-  saveState.classList.remove('is-err');
-  saveState.textContent = 'Alterações não salvas…';
-  clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(saveNow, 800);
+function setSaveState() {
+  saveBtn.classList.toggle('is-dirty', dirty);
+  saveBtn.classList.toggle('is-saved', !dirty);
+  saveBtn.textContent = dirty ? 'Salvar' : 'Salvo ✓';
+  if (dirty) { saveState.classList.remove('is-err'); saveState.textContent = 'Alterações não salvas'; }
 }
 
-function saveNow() {
-  clearTimeout(saveTimer);
-  if (!current) return Promise.resolve();
-  const snapshot = JSON.stringify(current);
+function changed() {
+  dirty = true;
+  drawPreview();
+  setSaveState();
+  // Cópia de segurança local (não vai para o cliente até salvar).
+  try { localStorage.setItem(backupKey(current!.id), JSON.stringify({ at: Date.now(), data: current })); } catch {}
+}
+
+async function save() {
+  if (!current) return;
+  if (saving) return saving;
   const id = current.id;
-  saving = saving.then(async () => {
-    saveState.textContent = 'Salvando…';
+  const snapshot = JSON.stringify(current);
+  saveBtn.disabled = true;
+  saveState.textContent = 'Salvando…';
+  saving = (async () => {
     try {
-      const saved = await api<Proposta>(`/api/admin/propostas/${id}`, { method: 'PUT', body: snapshot });
-      if (current?.id === id && saved.aceite && !current.aceite) { current.aceite = saved.aceite; current.status = 'aceita'; fillForm(); drawPreview(); }
-      saveState.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · o cliente já vê`;
+      const saved = await api<Prop>(`/api/admin/propostas/${id}`, { method: 'PUT', body: snapshot });
+      if (current?.id !== id) return;
+      if (JSON.stringify(current) === snapshot) { dirty = false; try { localStorage.removeItem(backupKey(id)); } catch {} }
+      if (saved.aceite && !current.aceite) { current.aceite = saved.aceite; current.status = 'aceita'; fillForm(); drawPreview(); }
+      current.atualizadaEm = saved.atualizadaEm;
+      saveState.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}${current.status === 'rascunho' ? '' : ' · o cliente já vê'}`;
+      showToast(current.status === 'rascunho' ? 'Proposta salva' : 'Salvo: o cliente já vê a nova versão');
     } catch (e) {
-      if ((e as Error).message !== 'unauthorized') { saveState.textContent = 'Erro ao salvar. Tentando de novo…'; saveState.classList.add('is-err'); saveTimer = window.setTimeout(saveNow, 4000); }
+      if ((e as Error).message !== 'unauthorized') { saveState.textContent = 'Erro ao salvar. Tente de novo.'; saveState.classList.add('is-err'); }
+    } finally {
+      saving = null;
+      saveBtn.disabled = false;
+      setSaveState();
     }
-  });
+  })();
   return saving;
 }
+
+saveBtn.addEventListener('click', () => save());
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's' && !views.editor.hidden) { e.preventDefault(); save(); }
+});
 
 async function openEditor(id: string) {
   show('editor');
   saveState.textContent = '';
+  dirty = false;
   preview.replaceChildren(h('p', { class: 'pp-empty' }, 'Carregando…'));
   try { current = await api(`/api/admin/propostas/${id}`); }
-  catch (e) { if ((e as Error).message !== 'unauthorized') { showToast('Proposta não encontrada'); go(null); } return; }
+  catch (e) { if ((e as Error).message !== 'unauthorized') { showToast('Proposta não encontrada'); go(null, true); } return; }
+  // Recupera alterações não salvas deste navegador, se houver.
+  try {
+    const raw = localStorage.getItem(backupKey(id));
+    if (raw) {
+      const b = JSON.parse(raw);
+      if (b.at > Date.parse(current!.atualizadaEm) && confirm('Encontramos alterações desta proposta que não foram salvas. Recuperar?')) {
+        current = { ...b.data, aceite: current!.aceite, visualizacoes: current!.visualizacoes };
+        dirty = true;
+      } else localStorage.removeItem(backupKey(id));
+    }
+  } catch {}
   fillForm();
   drawPreview();
+  setSaveState();
 }
 
-$('copy-link').addEventListener('click', () => current && copyLink(current.id, current.status));
-$('duplicate').addEventListener('click', async () => { if (current) { await saveNow(); duplicate(current.id); } });
+$('duplicate').addEventListener('click', async () => {
+  if (!current) return;
+  if (dirty) await save();
+  duplicate(current.id);
+});
 $('delete').addEventListener('click', async () => {
   if (!current || !confirm(`Apagar a proposta "${current.titulo}"? O link do cliente deixará de funcionar. Isso não pode ser desfeito.`)) return;
   await api(`/api/admin/propostas/${current.id}`, { method: 'DELETE' });
+  try { localStorage.removeItem(backupKey(current.id)); } catch {}
+  dirty = false;
   showToast('Proposta apagada');
   go(null);
 });
@@ -325,12 +484,15 @@ editorEl.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((b) =>
   }),
 );
 
-// Avisa antes de sair com alterações pendentes
-window.addEventListener('beforeunload', (e) => { if (saveState.textContent?.startsWith('Alterações')) { saveNow(); e.preventDefault(); } });
+window.addEventListener('beforeunload', (e) => { if (dirty) e.preventDefault(); });
 
 /* ================= ROTAS ================= */
-async function go(id: string | null) {
-  if (current) await saveNow();
+async function go(id: string | null, force = false) {
+  if (current && dirty && !force) {
+    if (!confirm('Há alterações não salvas. OK para salvar e sair, ou Cancelar para continuar editando.')) return;
+    await save();
+    if (dirty) return;
+  }
   history.pushState(null, '', id ? `/propostas/?id=${id}` : '/propostas/');
   route();
 }
@@ -346,6 +508,6 @@ async function route() {
   }
   const id = new URLSearchParams(location.search).get('id');
   if (id) openEditor(id);
-  else { current = null; loadList().catch(() => {}); }
+  else { current = null; dirty = false; loadList().catch(() => {}); }
 }
 route();

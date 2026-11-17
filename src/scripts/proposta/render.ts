@@ -131,16 +131,18 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
   const wa = p.responsavel.whatsapp.replace(/\D/g, '');
   const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(`Olá! Estou vendo a proposta "${p.titulo}" e tenho uma dúvida.`)}` : '';
   const footer = h('footer', { class: 'pp-accept' });
+  // append() escreveria "null" na tela: filtra os itens vazios.
+  const add = (...nodes: (Node | null)[]) => footer.append(...nodes.filter((n): n is Node => n !== null));
   if (p.aceite) {
-    footer.append(
+    add(
       h('div', { class: 'pp-accepted' }, h('span', { class: 'pp-check pp-check--big', 'aria-hidden': 'true' }, '✓'),
         h('div', {}, h('strong', {}, 'Proposta aceita'), h('p', {}, `por ${p.aceite.nome} em ${new Date(p.aceite.em).toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' })}`))),
       waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'Falar com a Astravox no WhatsApp') : null,
     );
   } else if (p.status === 'recusada') {
-    footer.append(h('p', { class: 'pp-closed' }, 'Esta proposta foi encerrada. Fale com a Astravox para uma nova versão.'), waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'WhatsApp') : null);
+    add(h('p', { class: 'pp-closed' }, 'Esta proposta foi encerrada. Fale com a Astravox para uma nova versão.'), waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'WhatsApp') : null);
   } else {
-    const form = h('form', { class: 'pp-form' });
+    const form = h('form', { class: 'pp-form' }) as HTMLFormElement;
     const input = h('input', { type: 'text', name: 'nome', placeholder: 'Seu nome completo', required: '', minlength: '2', 'aria-label': 'Seu nome completo', autocomplete: 'name' }) as HTMLInputElement;
     const btn = h('button', { class: 'pp-btn', type: 'submit' }, 'Aceitar proposta') as HTMLButtonElement;
     const msg = h('p', { class: 'pp-form__msg', role: 'status' });
@@ -154,7 +156,7 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
       try { await opts.onAceitar(input.value.trim()); }
       catch { btn.disabled = false; btn.textContent = 'Aceitar proposta'; msg.textContent = 'Não foi possível registrar agora. Tente de novo ou fale conosco no WhatsApp.'; }
     });
-    footer.append(
+    add(
       h('div', {}, h('h2', {}, 'Vamos começar?'), h('p', {}, 'Para aprovar, digite seu nome e clique em aceitar. Ficamos com o registro e entramos em contato para o kickoff.')),
       form,
       waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'Tirar dúvidas no WhatsApp') : null,
