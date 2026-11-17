@@ -102,40 +102,46 @@ import Logo from '../../components/Logo.astro';
           </div>
         </section>
 
+        <section class="ad-step ad-intro">
+          <h2><span>2</span> Introdução</h2>
+          <p class="ad-hint">Contexto do cliente e o que a proposta resolve. É o item 01 da proposta. Deixe uma linha em branco para separar parágrafos.</p>
+          <div class="field"><label for="f-intro" class="sr-only">Introdução</label><textarea id="f-intro" data-path="introducao" rows="5" placeholder="Ex.: O LIDE MT precisa de um site à altura da sua rede de líderes: moderno, rápido e fácil de atualizar."></textarea></div>
+        </section>
+
         <section class="ad-step">
-          <h2><span>2</span> Produtos</h2>
+          <h2><span>3</span> Produtos</h2>
           <p class="ad-hint">Escolha um ou mais. Objetivos, escopo, cronograma e investimento são preenchidos e você ajusta.</p>
           <div class="ad-products" id="products"></div>
         </section>
 
         <section class="ad-step">
-          <h2><span>3</span> Objetivos</h2>
+          <h2><span>4</span> Objetivos</h2>
           <div class="ad-rows" data-list="objetivos"></div>
           <div class="ad-suggest" id="suggestions"></div>
           <button class="ad-add" type="button" data-add="objetivos">+ Escrever objetivo</button>
         </section>
 
         <section class="ad-step">
-          <h2><span>4</span> Escopo</h2>
+          <h2><span>5</span> Escopo</h2>
           <div class="ad-rows" data-list="escopo"></div>
           <button class="ad-add" type="button" data-add="escopo">+ Item de escopo</button>
         </section>
 
         <section class="ad-step">
-          <h2><span>5</span> Cronograma</h2>
+          <h2><span>6</span> Cronograma</h2>
           <div class="ad-rows" data-list="cronograma"></div>
           <div class="ad-total-row"><button class="ad-add" type="button" data-add="cronograma">+ Etapa</button><span class="ad-total" id="total-dias"></span></div>
         </section>
 
         <section class="ad-step">
-          <h2><span>6</span> Investimento</h2>
+          <h2><span>7</span> Investimento</h2>
           <div class="ad-rows" data-list="investimento.itens"></div>
           <button class="ad-add" type="button" data-add="investimento.itens">+ Item com valor</button>
           <div class="ad-total-row"><span class="ad-total" id="total"></span><label class="ad-check"><input type="checkbox" data-path="investimento.mostrarTotal" /> Mostrar total</label></div>
         </section>
 
         <details class="ad-more">
-          <summary>Textos e detalhes <small>título, introdução, pagamento, validade, notas</small></summary>
+          <summary>Textos e detalhes <small>título, pagamento, validade, notas</small></summary>
           <div class="ad-more__body">
             <div class="field"><label>Título</label><input data-path="titulo" /></div>
             <div class="field"><label>Subtítulo</label><input data-path="subtitulo" /></div>
@@ -143,7 +149,6 @@ import Logo from '../../components/Logo.astro';
               <div class="field"><label>Data</label><input type="date" data-path="data" /></div>
               <div class="field"><label>Validade (dias)</label><input type="number" min="0" max="365" data-path="validadeDias" /></div>
             </div>
-            <div class="field"><label>Introdução</label><textarea data-path="introducao" rows="4" placeholder="Contexto do cliente e o que a proposta resolve. Linha em branco separa parágrafos."></textarea></div>
             <div class="field"><label>Observação do investimento</label><textarea data-path="investimento.observacao" rows="2"></textarea></div>
             <div class="field"><label>Condições de pagamento</label><textarea data-path="pagamento" rows="2"></textarea></div>
             <div class="field"><label>Próximos passos</label><textarea data-path="proximosPassos" rows="2"></textarea></div>
@@ -292,7 +297,9 @@ import Logo from '../../components/Logo.astro';
   .ad-form .field textarea { min-height: 0; }
   .ad-form .field label { font-size: 13px; font-weight: 500; }
   .row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-  .row2--client { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .row2--client { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { .row2--client { grid-template-columns: 1fr; } }
+  .ad-intro textarea { min-height: 120px; line-height: 1.55; }
   .ad-rows { display: grid; gap: 8px; }
   .ad-row input, .ad-row textarea { font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; width: 100%; min-width: 0; }
   .ad-row textarea { resize: none; overflow: hidden; line-height: 1.4; display: block; }
