@@ -13,7 +13,7 @@ export type Proposta = {
   introducao: string;
   objetivos: string[];
   escopo: { titulo: string; descricao: string }[];
-  cronograma: { titulo: string; prazo: string }[];
+  cronograma: { titulo: string; dias: number }[];
   investimento: { itens: { descricao: string; valor: number }[]; observacao: string; mostrarTotal: boolean };
   pagamento: string;
   proximosPassos: string;
@@ -23,6 +23,8 @@ export type Proposta = {
   notasInternas?: string;
 };
 
+export const diasTxt = (n: number) => `${n} ${n === 1 ? 'dia' : 'dias'}`;
+export const totalDias = (p: Pick<Proposta, 'cronograma'>) => p.cronograma.reduce((s, e) => s + (e.dias || 0), 0);
 export const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 export const dataBR = (iso: string) => {
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
@@ -106,8 +108,14 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
   if (objetivos.length) sections.push(['Objetivos', h('ul', { class: 'pp-checks' }, objetivos.map((o) => h('li', {}, h('span', { class: 'pp-check', 'aria-hidden': 'true' }, '✓'), o)))]);
   const escopo = p.escopo.filter((e) => e.titulo.trim() || e.descricao.trim());
   if (escopo.length) sections.push(['Escopo', h('div', { class: 'pp-cards' }, escopo.map((e, i) => h('div', { class: 'pp-card' }, h('span', { class: 'pp-n' }, String(i + 1).padStart(2, '0')), h('h3', {}, e.titulo), e.descricao ? h('div', { class: 'pp-text' }, paragraphs(e.descricao)) : null)))]);
-  const etapas = p.cronograma.filter((e) => e.titulo.trim() || e.prazo.trim());
-  if (etapas.length) sections.push(['Cronograma', h('ol', { class: 'pp-timeline' }, etapas.map((e) => h('li', {}, h('span', { class: 'pp-dot', 'aria-hidden': 'true' }), h('strong', {}, e.titulo), e.prazo ? h('span', { class: 'pp-prazo' }, e.prazo) : null)))]);
+  const etapas = p.cronograma.filter((e) => e.titulo.trim() || e.dias);
+  if (etapas.length) {
+    const total = totalDias({ cronograma: etapas });
+    sections.push(['Cronograma', h('div', {},
+      h('ol', { class: 'pp-timeline' }, etapas.map((e) => h('li', {}, h('span', { class: 'pp-dot', 'aria-hidden': 'true' }), h('strong', {}, e.titulo), e.dias ? h('span', { class: 'pp-prazo' }, diasTxt(e.dias)) : null))),
+      total ? h('p', { class: 'pp-total-time' }, h('span', {}, 'Prazo total estimado'), h('strong', {}, diasTxt(total))) : null,
+    )]);
+  }
   const itens = p.investimento.itens.filter((i) => i.descricao.trim() || i.valor);
   if (itens.length || p.investimento.observacao.trim()) {
     const total = itens.reduce((s, i) => s + (i.valor || 0), 0);

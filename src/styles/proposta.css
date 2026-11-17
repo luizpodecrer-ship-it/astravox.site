@@ -1,5 +1,10 @@
 /* ============ Documento de proposta (cliente + prévia do editor) ============ */
-.pp { --pad: clamp(22px, 4vw, 56px); max-width: 920px; margin: 0 auto; color: var(--ink); font-family: var(--font); }
+/* Tipografia: Outfit nos títulos, Plus Jakarta Sans no texto (pesos 400 e 700). */
+.pp {
+  --heading-font: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --body-font: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+.pp { --pad: clamp(22px, 4vw, 56px); max-width: 920px; margin: 0 auto; color: var(--ink); font-family: var(--body-font); font-weight: 400; }
 .pp-cover {
   position: relative; overflow: hidden; isolation: isolate;
   background: var(--ink); color: #fff; border-radius: var(--radius);
@@ -43,6 +48,9 @@
 .pp-dot { position: absolute; left: -7px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--ink); }
 .pp-timeline strong { font-weight: 500; font-size: 16.5px; }
 .pp-prazo { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); background: var(--soft); border: 1px solid var(--line); padding: 3px 10px; border-radius: 999px; }
+.pp-total-time { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; padding: 16px 20px; border-radius: 14px; background: var(--ink); color: #fff; }
+.pp-total-time span { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+.pp-total-time strong { font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: var(--lime); }
 .pp-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .pp-table td { padding: 15px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 .pp-table td:last-child { text-align: right; white-space: nowrap; padding-left: 20px; font-variant-numeric: tabular-nums; }
@@ -70,7 +78,21 @@
 @media print {
   @page { margin: 14mm; }
   .no-print { display: none !important; }
-  .pp-cover, .pp-total, .pp-check { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pp-cover, .pp-total, .pp-total-time, .pp-check { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pp-section, .pp-card, .pp-timeline li, .pp-table tr { break-inside: avoid; }
   .pp-form, .pp-accept .pp-btn { display: none; }
 }
+
+/* ---------- Fontes da proposta ---------- */
+.pp h1, .pp h2, .pp h3, .pp-logo b, .pp-total, .pp-total-time strong, .pp-table tfoot td, .pp-accepted strong {
+  font-family: var(--heading-font); font-weight: 700;
+}
+.pp-cover h1 { letter-spacing: -.03em; line-height: 1.02; }
+.pp-section h2, .pp-accept h2 { letter-spacing: -.025em; }
+.pp-card h3 { letter-spacing: -.01em; }
+.pp-timeline strong { font-weight: 700; }
+.pp-meta dt, .pp-tag, .pp-n, .pp-prazo, .pp-sign, .pp-total-time span {
+  font-family: var(--body-font); font-weight: 700; letter-spacing: .08em;
+}
+.pp-btn, .pp-form input { font-family: var(--body-font); font-weight: 700; }
+.pp-form input { font-weight: 400; }

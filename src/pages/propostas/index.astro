@@ -120,7 +120,7 @@ import Logo from '../../components/Logo.astro';
         <section class="ad-step">
           <h2><span>5</span> Cronograma</h2>
           <div class="ad-rows" data-list="cronograma"></div>
-          <button class="ad-add" type="button" data-add="cronograma">+ Etapa</button>
+          <div class="ad-total-row"><button class="ad-add" type="button" data-add="cronograma">+ Etapa</button><span class="ad-total" id="total-dias"></span></div>
         </section>
 
         <section class="ad-step">
@@ -302,10 +302,6 @@ import Logo from '../../components/Logo.astro';
   .ad-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 6px; border-radius: 10px; background: var(--soft); align-items: start; }
   .ad-row__fields { display: grid; gap: 6px; min-width: 0; }
   .ad-row .short { max-width: 130px; }
-  .ad-row__tools { display: flex; gap: 2px; opacity: .35; transition: opacity .2s; }
-  .ad-row:hover .ad-row__tools, .ad-row:focus-within .ad-row__tools { opacity: 1; }
-  .ad-row__tools button { width: 26px; height: 32px; border: 0; background: none; border-radius: 6px; }
-  .ad-row__tools button:hover { background: #fff; }
   .ad-total-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
   .ad-more { border: 1px solid var(--line); border-radius: 14px; background: #fff; }
   .ad-more summary { cursor: pointer; padding: 14px 16px; font-weight: 500; list-style: none; display: flex; gap: 10px; align-items: baseline; }
@@ -320,6 +316,25 @@ import Logo from '../../components/Logo.astro';
   .ad-save-btn.is-saved { --bg: #fff; --fg: var(--ink); border: 1px solid var(--line); }
   .ad-status span { display: none; }
   @media (min-width: 1300px) { .ad-status span { display: inline; } }
+
+  /* Linhas das listas: alça | campos | remover */
+  .ad-row { grid-template-columns: auto 1fr auto; align-items: center; }
+  .ad-handle { width: 26px; height: 36px; border: 0; background: none; border-radius: 6px; color: #9a9aa6; font-size: 16px; cursor: grab; touch-action: none; align-self: start; }
+  .ad-handle:hover:not(:disabled) { background: #fff; color: var(--ink); }
+  .ad-handle:disabled { cursor: default; opacity: .3; }
+  .ad-row.is-dragging { box-shadow: 0 14px 30px -12px rgba(0,0,0,.35); background: #fff; outline: 2px solid var(--lime); position: relative; z-index: 2; }
+  .ad-row.is-dragging .ad-handle { cursor: grabbing; }
+  .ad-del-item { width: 30px; height: 36px; border: 0; background: none; border-radius: 6px; color: #9a9aa6; align-self: start; }
+  .ad-del-item:hover { background: #fff; color: #b3261e; }
+  .ad-row__line { display: flex; gap: 6px; align-items: flex-start; }
+  .ad-row__line > textarea { flex: 1 1 auto; }
+  .ad-row__line > .short, .ad-row__line > .ad-days { flex: none; }
+  .ad-row .short { width: 130px; }
+  .ad-days { display: inline-flex; align-items: center; flex: none; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
+  .ad-days__btn { width: 34px; height: 34px; border: 0; background: none; border-radius: 50%; font-size: 18px; line-height: 1; color: var(--ink); }
+  .ad-days__btn:hover:not(:disabled) { background: var(--lime); }
+  .ad-days__btn:disabled { color: #c4c4cc; }
+  .ad-days__value { min-width: 62px; text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; }
 </style>
 
 <script>

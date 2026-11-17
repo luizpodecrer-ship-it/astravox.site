@@ -52,12 +52,13 @@ check('cookie adulterado recusado', r.data.authenticated === false);
 r = await call(admin, 'POST', '/api/admin/propostas', { body: {}, jar: admJar });
 check('cria proposta', r.status === 201 && /^[A-Za-z0-9_-]{16}$/.test(r.data.id));
 const id = r.data.id;
-const p = { ...r.data, produtos: ['site', '<x>'], cliente: { nome: 'Maria Souza', empresa: 'Clínica X', whatsapp: '(65) 99999-0000', email: 'maria@clinica.com' }, titulo: 'Novo site', notasInternas: 'margem 40%', escopo: [{ titulo: 'Site', descricao: '<script>alert(1)</script>' }], investimento: { itens: [{ descricao: 'Site', valor: 4500 }, { descricao: 'SEO', valor: '1.200,50' }], observacao: '', mostrarTotal: true }, extra: 'ignorar', aceite: { nome: 'hacker', em: 'x' } };
+const p = { ...r.data, produtos: ['site', '<x>'], cliente: { nome: 'Maria Souza', empresa: 'Clínica X', whatsapp: '(65) 99999-0000', email: 'maria@clinica.com' }, titulo: 'Novo site', notasInternas: 'margem 40%', escopo: [{ titulo: 'Site', descricao: '<script>alert(1)</script>' }], investimento: { itens: [{ descricao: 'Site', valor: 4500 }, { descricao: 'SEO', valor: '1.200,50' }], observacao: '', mostrarTotal: true }, extra: 'ignorar', aceite: { nome: 'hacker', em: 'x' }, cronograma: [{ titulo: 'Layout', prazo: '2 Dias' }, { titulo: 'Dev', prazo: '1–2 semanas' }, { titulo: 'Testes', dias: 3 }, { titulo: 'Fim', dias: -4 }] };
 r = await call(admin, 'PUT', `/api/admin/propostas/${id}`, { body: p, jar: admJar, params: { id } });
 check('salva proposta', r.status === 200 && r.data.titulo === 'Novo site');
 check('campo desconhecido descartado', !('extra' in r.data));
 check('editor não consegue forjar aceite', r.data.aceite === null);
 check('contato do cliente salvo', r.data.cliente.whatsapp === '65999990000' && r.data.cliente.email === 'maria@clinica.com', JSON.stringify(r.data.cliente));
+check('prazos em texto viram dias', JSON.stringify(r.data.cronograma.map((e) => e.dias)) === '[2,10,3,0]', JSON.stringify(r.data.cronograma));
 check('produtos limpos', JSON.stringify(r.data.produtos) === '["site","x"]', JSON.stringify(r.data.produtos));
 check('valor "1.200,50" vira número', r.data.investimento.itens[1].valor === 1200.5, String(r.data.investimento.itens[1].valor));
 

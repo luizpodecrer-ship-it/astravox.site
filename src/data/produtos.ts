@@ -3,7 +3,7 @@
  * Ao escolher um produto, o editor adiciona estes itens à proposta (todos editáveis).
  * - objetivos: entram marcados; sugestoes: aparecem como "+ chips" para incluir com um clique.
  * - valor do investimento começa em 0: preencha na proposta (não há preço de tabela aqui).
- * - prazos são sugestões; ajuste por projeto.
+ * - cronograma em dias (úteis); são sugestões, ajuste com − e + em cada proposta.
  */
 
 export type Produto = {
@@ -14,7 +14,7 @@ export type Produto = {
   objetivos: string[];
   sugestoes: string[];
   escopo: { titulo: string; descricao: string }[];
-  cronograma: { titulo: string; prazo: string }[];
+  cronograma: { titulo: string; dias: number }[];
   investimento: { descricao: string; valor: number }[];
   observacao?: string;
 };
@@ -45,11 +45,11 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Integrações', descricao: 'Botão de WhatsApp, formulário de contato e Google Analytics.' },
     ],
     cronograma: [
-      { titulo: 'Briefing e conteúdo', prazo: '1 dia' },
-      { titulo: 'Desenvolvimento do layout', prazo: '2 dias' },
-      { titulo: 'Programação e desenvolvimento', prazo: '5 dias' },
-      { titulo: 'Testes e ajustes', prazo: '1 dia' },
-      { titulo: 'Publicação e apresentação', prazo: '1 dia' },
+      { titulo: 'Briefing e conteúdo', dias: 1 },
+      { titulo: 'Desenvolvimento do layout', dias: 2 },
+      { titulo: 'Programação e desenvolvimento', dias: 5 },
+      { titulo: 'Testes e ajustes', dias: 1 },
+      { titulo: 'Publicação e apresentação', dias: 1 },
     ],
     investimento: [{ descricao: 'Desenvolvimento de site institucional', valor: 0 }],
     observacao: OBS_WEB,
@@ -68,10 +68,10 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Rastreamento', descricao: 'Google Analytics, Meta Pixel e eventos de conversão.' },
     ],
     cronograma: [
-      { titulo: 'Briefing e copy', prazo: '1 dia' },
-      { titulo: 'Design', prazo: '2 dias' },
-      { titulo: 'Desenvolvimento e integrações', prazo: '2 dias' },
-      { titulo: 'Testes e publicação', prazo: '1 dia' },
+      { titulo: 'Briefing e copy', dias: 1 },
+      { titulo: 'Design', dias: 2 },
+      { titulo: 'Desenvolvimento e integrações', dias: 2 },
+      { titulo: 'Testes e publicação', dias: 1 },
     ],
     investimento: [{ descricao: 'Desenvolvimento de landing page', valor: 0 }],
     observacao: OBS_WEB,
@@ -90,10 +90,10 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'SEO e métricas', descricao: 'Páginas otimizadas para o Google e Google Analytics com eventos de compra.' },
     ],
     cronograma: [
-      { titulo: 'Briefing e configuração da plataforma', prazo: '1 semana' },
-      { titulo: 'Design da loja', prazo: '1 semana' },
-      { titulo: 'Desenvolvimento e integrações', prazo: '2 semanas' },
-      { titulo: 'Cadastro, testes e lançamento', prazo: '1 semana' },
+      { titulo: 'Briefing e configuração da plataforma', dias: 5 },
+      { titulo: 'Design da loja', dias: 5 },
+      { titulo: 'Desenvolvimento e integrações', dias: 10 },
+      { titulo: 'Cadastro, testes e lançamento', dias: 5 },
     ],
     investimento: [{ descricao: 'Desenvolvimento de loja virtual', valor: 0 }],
     observacao: 'Valores não incluem mensalidade da plataforma, taxas de pagamento, hospedagem e domínio.',
@@ -112,10 +112,10 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Infraestrutura em nuvem', descricao: 'Banco de dados, backups e publicação com acompanhamento.' },
     ],
     cronograma: [
-      { titulo: 'Descoberta e protótipo', prazo: '1–2 semanas' },
-      { titulo: 'Desenvolvimento (entregas semanais)', prazo: '4–8 semanas' },
-      { titulo: 'Testes com a equipe', prazo: '1 semana' },
-      { titulo: 'Lançamento e treinamento', prazo: '1 semana' },
+      { titulo: 'Descoberta e protótipo', dias: 7 },
+      { titulo: 'Desenvolvimento (entregas semanais)', dias: 30 },
+      { titulo: 'Testes com a equipe', dias: 5 },
+      { titulo: 'Lançamento e treinamento', dias: 5 },
     ],
     investimento: [{ descricao: 'Desenvolvimento do sistema web', valor: 0 }],
     observacao: 'Valores não incluem custos de infraestrutura em nuvem e licenças de terceiros.',
@@ -134,10 +134,10 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Publicação nas lojas', descricao: 'Preparação das páginas e envio para App Store e Google Play.' },
     ],
     cronograma: [
-      { titulo: 'Protótipo', prazo: '2 semanas' },
-      { titulo: 'Design das telas', prazo: '2 semanas' },
-      { titulo: 'Desenvolvimento', prazo: '6–10 semanas' },
-      { titulo: 'Testes e publicação', prazo: '2 semanas' },
+      { titulo: 'Protótipo', dias: 10 },
+      { titulo: 'Design das telas', dias: 10 },
+      { titulo: 'Desenvolvimento', dias: 40 },
+      { titulo: 'Testes e publicação', dias: 10 },
     ],
     investimento: [{ descricao: 'Desenvolvimento do aplicativo', valor: 0 }],
     observacao: 'Valores não incluem as taxas das contas de desenvolvedor da Apple e do Google.',
@@ -156,10 +156,10 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Acompanhamento', descricao: 'Ajustes com base nas conversas reais nas primeiras semanas.' },
     ],
     cronograma: [
-      { titulo: 'Diagnóstico', prazo: '3 dias' },
-      { titulo: 'Configuração e integrações', prazo: '1–2 semanas' },
-      { titulo: 'Testes com a equipe', prazo: '3 dias' },
-      { titulo: 'Lançamento e acompanhamento', prazo: '2 semanas' },
+      { titulo: 'Diagnóstico', dias: 3 },
+      { titulo: 'Configuração e integrações', dias: 7 },
+      { titulo: 'Testes com a equipe', dias: 3 },
+      { titulo: 'Lançamento e acompanhamento', dias: 10 },
     ],
     investimento: [{ descricao: 'Implantação do assistente de IA', valor: 0 }],
     observacao: 'Valores não incluem o consumo das plataformas de IA e de mensagens, cobrado por uso.',
@@ -178,9 +178,9 @@ export const PRODUTOS: Produto[] = [
       { titulo: 'Manual da marca', descricao: 'Guia de uso com aplicações e arquivos finais.' },
     ],
     cronograma: [
-      { titulo: 'Pesquisa e conceito', prazo: '3 dias' },
-      { titulo: 'Criação e apresentação', prazo: '5 dias' },
-      { titulo: 'Ajustes e manual da marca', prazo: '3 dias' },
+      { titulo: 'Pesquisa e conceito', dias: 3 },
+      { titulo: 'Criação e apresentação', dias: 5 },
+      { titulo: 'Ajustes e manual da marca', dias: 3 },
     ],
     investimento: [{ descricao: 'Criação da identidade visual', valor: 0 }],
   },

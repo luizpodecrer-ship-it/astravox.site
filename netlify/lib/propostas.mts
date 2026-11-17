@@ -4,7 +4,7 @@ import { getStore } from '@netlify/blobs';
 import { randomBytes } from 'node:crypto';
 
 export type Item = { titulo: string; descricao: string };
-export type Etapa = { titulo: string; prazo: string };
+export type Etapa = { titulo: string; dias: number };
 export type Valor = { descricao: string; valor: number };
 
 export type Proposta = {
@@ -41,6 +41,20 @@ const num = (v: unknown) => {
   const n = typeof v === 'number' ? v : parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0;
 };
+/**
+ * Prazo da etapa em dias (inteiro, 0–365). Aceita o formato antigo em texto:
+ * "2 dias" → 2, "1–2 semanas" → 10 (usa o maior valor; semana = 5 dias úteis), "1 mês" → 20.
+ */
+export function diasDe(x: any): number {
+  if (typeof x?.dias === 'number' && Number.isFinite(x.dias)) return Math.max(0, Math.min(365, Math.round(x.dias)));
+  const t = String(x?.prazo ?? '').toLowerCase();
+  const nums = (t.match(/\d+/g) ?? []).map(Number);
+  if (!nums.length) return 0;
+  const n = Math.max(...nums);
+  const mult = /semana/.test(t) ? 5 : /m[eê]s/.test(t) ? 20 : 1;
+  return Math.max(0, Math.min(365, n * mult));
+}
+
 const list = <T,>(v: unknown, fn: (x: any) => T, max = 40): T[] => (Array.isArray(v) ? v.slice(0, max).map(fn) : []);
 
 /** Aceita só os campos conhecidos, com tipos e tamanhos limitados. */
@@ -63,7 +77,7 @@ export function sanitize(input: any, base: Proposta): Proposta {
     introducao: str(input?.introducao),
     objetivos: list(input?.objetivos, (x) => str(x, 300)),
     escopo: list(input?.escopo, (x) => ({ titulo: str(x?.titulo, 160), descricao: str(x?.descricao, 2000) })),
-    cronograma: list(input?.cronograma, (x) => ({ titulo: str(x?.titulo, 160), prazo: str(x?.prazo, 80) })),
+    cronograma: list(input?.cronograma, (x) => ({ titulo: str(x?.titulo, 160), dias: diasDe(x) })),
     investimento: {
       itens: list(input?.investimento?.itens, (x) => ({ descricao: str(x?.descricao, 200), valor: num(x?.valor) })),
       observacao: str(input?.investimento?.observacao, 1000),
@@ -111,5 +125,10 @@ export function publicView(p: Proposta) {
 
 /** Propostas antigas (antes dos campos novos) continuam abrindo. */
 export function normalize(p: Proposta): Proposta {
-  return { ...p, cliente: { whatsapp: '', email: '', ...p.cliente }, produtos: p.produtos ?? [] };
+  return {
+    ...p,
+    cliente: { whatsapp: '', email: '', ...p.cliente },
+    produtos: p.produtos ?? [],
+    cronograma: (p.cronograma ?? []).map((e: any) => ({ titulo: e.titulo ?? '', dias: diasDe(e) })),
+  };
 }

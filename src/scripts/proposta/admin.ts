@@ -1,5 +1,5 @@
 // Painel de propostas: login, lista e editor com salvamento automático e prévia ao vivo.
-import { renderProposta, brl, h, type Proposta } from './render';
+import { renderProposta, brl, diasTxt, totalDias, h, type Proposta } from './render';
 import { PRODUTOS, type Produto } from '../../data/produtos';
 
 type Prop = Proposta & { cliente: Proposta['cliente'] & { whatsapp: string; email: string }; produtos: string[]; notasInternas: string };
@@ -218,18 +218,72 @@ function setPath(obj: any, path: string, value: unknown) {
   keys.reduce((o, k) => o[k], obj)[last] = value;
 }
 
-type Field = { key?: string; placeholder: string; type?: 'text' | 'area' | 'money'; short?: boolean };
+type Field = { key?: string; placeholder: string; type?: 'text' | 'area' | 'money' | 'days'; short?: boolean };
 type ListDef = { blank: () => any; fields: Field[] };
 const LISTS: Record<string, ListDef> = {
   objetivos: { blank: () => '', fields: [{ placeholder: 'Objetivo' }] },
   escopo: { blank: () => ({ titulo: '', descricao: '' }), fields: [{ key: 'titulo', placeholder: 'Item' }, { key: 'descricao', placeholder: 'Descrição (opcional)', type: 'area' }] },
-  cronograma: { blank: () => ({ titulo: '', prazo: '' }), fields: [{ key: 'titulo', placeholder: 'Etapa' }, { key: 'prazo', placeholder: 'Prazo', short: true }] },
+  cronograma: { blank: () => ({ titulo: '', dias: 1 }), fields: [{ key: 'titulo', placeholder: 'Etapa' }, { key: 'dias', placeholder: 'Dias', type: 'days' }] },
   'investimento.itens': { blank: () => ({ descricao: '', valor: 0 }), fields: [{ key: 'descricao', placeholder: 'Descrição' }, { key: 'valor', placeholder: 'R$ 0,00', type: 'money', short: true }] },
 };
 
 function autoGrow(el: HTMLTextAreaElement) {
   el.style.height = 'auto';
   el.style.height = `${el.scrollHeight + 2}px`;
+}
+
+/** Contador de dias: [ − ] 2 dias [ + ] */
+function daysStepper(get: () => number, set: (n: number) => void) {
+  const out = h('output', { class: 'ad-days__value', 'aria-live': 'polite' });
+  const show = () => { out.textContent = diasTxt(get()); minus.disabled = get() <= 0; };
+  const minus = h('button', { type: 'button', class: 'ad-days__btn', 'aria-label': 'Menos um dia' }, '−') as HTMLButtonElement;
+  const plus = h('button', { type: 'button', class: 'ad-days__btn', 'aria-label': 'Mais um dia' }, '+') as HTMLButtonElement;
+  minus.addEventListener('click', () => { set(Math.max(0, get() - 1)); show(); });
+  plus.addEventListener('click', () => { set(Math.min(365, get() + 1)); show(); });
+  show();
+  return h('div', { class: 'ad-days', role: 'group', 'aria-label': 'Dias da etapa' }, minus, out, plus);
+}
+
+/** Reordenar arrastando pela alça (mouse e toque); com a alça em foco, ↑/↓ do teclado também movem. */
+function makeDraggable(handle: HTMLElement, row: HTMLElement, wrap: Element, arr: any[], path: string, index: number) {
+  const move = (to: number) => {
+    if (to < 0 || to >= arr.length || to === index) return;
+    const [item] = arr.splice(index, 1);
+    arr.splice(to, 0, item);
+    renderList(path);
+    changed();
+    (wrap.querySelectorAll<HTMLElement>('.ad-handle')[to])?.focus();
+  };
+  handle.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') { e.preventDefault(); move(index - 1); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(index + 1); }
+  });
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    row.classList.add('is-dragging');
+    const rows = () => [...wrap.querySelectorAll<HTMLElement>(':scope > .ad-row')];
+    // Acompanha o ponteiro pela página inteira: mover a linha no DOM não pode interromper o arraste.
+    const onMove = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
+      ev.preventDefault();
+      const others = rows().filter((r) => r !== row);
+      const after = others.find((r) => { const bx = r.getBoundingClientRect(); return ev.clientY < bx.top + bx.height / 2; }) ?? null;
+      if (row.nextElementSibling !== after || (after === null && wrap.lastElementChild !== row)) wrap.insertBefore(row, after);
+    };
+    const onUp = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onUp);
+      row.classList.remove('is-dragging');
+      const to = rows().indexOf(row);
+      if (to !== index) move(to); else renderList(path);
+    };
+    document.addEventListener('pointermove', onMove, { passive: false });
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('pointercancel', onUp);
+  });
 }
 
 function renderList(path: string) {
@@ -242,6 +296,10 @@ function renderList(path: string) {
       const fields = h('div', { class: 'ad-row__fields' }, line);
       for (const f of def.fields) {
         const value = f.key ? item[f.key] : item;
+        if (f.type === 'days') {
+          line.append(daysStepper(() => arr[i][f.key!] || 0, (n) => { arr[i][f.key!] = n; changed(); }));
+          continue;
+        }
         let el: HTMLInputElement | HTMLTextAreaElement;
         if (f.type === 'area') { el = h('textarea', { rows: '2', placeholder: f.placeholder, 'aria-label': f.placeholder }) as HTMLTextAreaElement; el.value = value ?? ''; fields.append(el); }
         else {
@@ -259,17 +317,22 @@ function renderList(path: string) {
           changed();
         });
       }
-      const tools = h('div', { class: 'ad-row__tools' });
-      const mk = (label: string, title: string, fn: () => void) => { const b = h('button', { type: 'button', title, 'aria-label': title }, label); b.addEventListener('click', fn); tools.append(b); };
-      if (arr.length > 1) {
-        mk('↑', 'Mover para cima', () => { if (i > 0) { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; renderList(path); changed(); } });
-        mk('↓', 'Mover para baixo', () => { if (i < arr.length - 1) { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; renderList(path); changed(); } });
-      }
-      mk('✕', 'Remover', () => { arr.splice(i, 1); renderList(path); if (path === 'objetivos') renderSuggestions(); changed(); });
+      const row = h('div', { class: 'ad-row' });
+      const handle = h('button', { type: 'button', class: 'ad-handle', title: 'Arraste para reordenar', 'aria-label': `Reordenar item ${i + 1} (use ↑ e ↓)` }, '⠿');
+      const del = h('button', { type: 'button', class: 'ad-del-item', title: 'Remover', 'aria-label': 'Remover item' }, '✕');
+      del.addEventListener('click', () => { arr.splice(i, 1); renderList(path); if (path === 'objetivos') renderSuggestions(); changed(); });
+      if (arr.length > 1) makeDraggable(handle, row, wrap, arr, path, i); else handle.setAttribute('disabled', '');
+      row.append(handle, fields, del);
       requestAnimationFrame(() => fields.querySelectorAll<HTMLTextAreaElement>('textarea').forEach(autoGrow));
-      return h('div', { class: 'ad-row' }, fields, tools);
+      return row;
     }),
   );
+  if (path === 'cronograma') updateTotalDias();
+}
+
+function updateTotalDias() {
+  const total = current ? totalDias(current) : 0;
+  $('total-dias').textContent = current?.cronograma.length ? `Prazo total: ${diasTxt(total)}` : '';
 }
 
 form.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((b) =>
@@ -307,7 +370,7 @@ function removeProduct(prod: Produto) {
   const usedElsewhere = (fn: (o: Produto) => boolean) => others.some(fn);
   p.objetivos = p.objetivos.filter((o) => !prod.objetivos.concat(prod.sugestoes).some((x) => same(x, o)) || usedElsewhere((op) => op.objetivos.some((x) => same(x, o))));
   p.escopo = p.escopo.filter((e) => !prod.escopo.some((x) => same(x.titulo, e.titulo) && same(x.descricao, e.descricao)));
-  p.cronograma = p.cronograma.filter((c) => !prod.cronograma.some((x) => same(x.titulo, c.titulo) && same(x.prazo, c.prazo)));
+  p.cronograma = p.cronograma.filter((c) => !prod.cronograma.some((x) => same(x.titulo, c.titulo) && x.dias === c.dias));
   p.investimento.itens = p.investimento.itens.filter((v) => v.valor > 0 || !prod.investimento.some((x) => same(x.descricao, v.descricao)));
   if (prod.observacao && same(p.investimento.observacao, prod.observacao)) p.investimento.observacao = others.find((o) => o.observacao)?.observacao ?? '';
   if (same(p.titulo, prod.titulo)) p.titulo = others[0]?.titulo ?? 'Proposta comercial';
@@ -388,6 +451,7 @@ function drawPreview() {
   preview.scrollTop = scroll;
   const total = current.investimento.itens.reduce((s, i) => s + (i.valor || 0), 0);
   $('total').textContent = current.investimento.itens.length ? `Total: ${brl(total)}` : '';
+  updateTotalDias();
 }
 
 function setSaveState() {
