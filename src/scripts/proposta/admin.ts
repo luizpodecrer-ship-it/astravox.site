@@ -396,6 +396,7 @@ function renderProducts() {
       const b = h('button', { type: 'button', class: 'ad-chip', 'aria-pressed': String(on) }, prod.nome);
       b.addEventListener('click', () => {
         if (on) removeProduct(prod); else addProduct(prod);
+        refreshIntro();
         fillForm();
         changed();
       });
@@ -417,6 +418,45 @@ function renderSuggestions() {
   );
 }
 
+/* ---------- Introdução sugerida ---------- */
+const juntar = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} e ${xs[xs.length - 1]}`);
+/** "Igor Taques / Ruth Semiramys" → "Igor e Ruth" */
+const primeirosNomes = (nome: string) => juntar(nome.split(/\s*(?:\/|,|&|\se\s)\s*/i).map((n) => n.trim().split(/\s+/)[0]).filter(Boolean));
+
+function sugestaoIntro(p: Prop) {
+  const nomes = primeirosNomes(p.cliente.nome);
+  const empresa = p.cliente.empresa.trim();
+  const prods = PRODUTOS.filter((x) => p.produtos.includes(x.id));
+  const necessidade = prods.length ? juntar(prods.map((x) => x.necessidade)) : 'um projeto digital bem planejado';
+  const entrega = prods.length ? juntar(prods.map((x) => x.entrega)) : 'o projeto';
+  return `Olá${nomes ? `, ${nomes}` : ''}! Obrigado pela oportunidade de apresentar esta proposta.
+
+${empresa || 'Sua empresa'} está em um momento que pede ${necessidade}. Aqui você encontra os objetivos, o escopo, o cronograma e o investimento para ${entrega}, com acompanhamento próximo da Astravox em todas as etapas.`;
+}
+
+/** Texto automático: acompanha nome, empresa e produtos até você editar a introdução. */
+let introAuto = '';
+function refreshIntro(force = false) {
+  if (!current) return;
+  const atual = current.introducao.trim();
+  if (!force && atual && atual !== introAuto.trim()) return; // texto editado por você: não mexe
+  introAuto = sugestaoIntro(current);
+  current.introducao = introAuto;
+  const el = $<HTMLTextAreaElement>('f-intro');
+  el.value = introAuto;
+  updateIntroHint();
+}
+function updateIntroHint() {
+  const editado = !!current && current.introducao.trim() !== '' && current.introducao.trim() !== introAuto.trim();
+  $('intro-reset').hidden = !editado;
+  $('intro-auto').hidden = editado;
+}
+$('intro-reset').addEventListener('click', () => {
+  if (current && current.introducao.trim() && !confirm('Substituir a introdução atual pelo texto sugerido?')) return;
+  refreshIntro(true);
+  changed();
+});
+
 /* ---------- Campos simples ---------- */
 form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-path]').forEach((el) => {
   el.addEventListener('input', () => {
@@ -425,6 +465,8 @@ form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-path]').for
     if (el instanceof HTMLInputElement && el.type === 'number') v = Number(v) || 0;
     if (el.dataset.mask === 'phone') v = waNumber(String(v));
     setPath(current, path, v);
+    if (path === 'cliente.nome' || path === 'cliente.empresa') refreshIntro();
+    if (path === 'introducao') updateIntroHint();
     changed();
   });
   if (el.dataset.mask === 'phone') el.addEventListener('blur', () => { el.value = fmtPhone(getPath(current, el.dataset.path!) ?? ''); });
@@ -531,7 +573,10 @@ async function openEditor(id: string) {
       } else localStorage.removeItem(backupKey(id));
     }
   } catch {}
+  introAuto = sugestaoIntro(current!);
+  if (!current!.introducao.trim()) { refreshIntro(true); dirty = true; }
   fillForm();
+  updateIntroHint();
   drawPreview();
   setSaveState();
 }

@@ -11,6 +11,10 @@ export type Produto = {
   nome: string;
   titulo: string;
   subtitulo: string;
+  /** Trecho da introdução sugerida: "... está em um momento que pede ..." */
+  necessidade: string;
+  /** Trecho da introdução sugerida: "para ..." */
+  entrega: string;
   objetivos: string[];
   sugestoes: string[];
   escopo: { titulo: string; descricao: string }[];
@@ -27,6 +31,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Site institucional',
     titulo: 'Novo site institucional',
     subtitulo: 'Site profissional, rápido e preparado para aparecer no Google.',
+    necessidade: 'um site moderno, rápido e preparado para aparecer no Google',
+    entrega: 'o novo site institucional',
     objetivos: [
       'Transmitir uma imagem profissional e atual da empresa',
       'Aparecer no Google para as buscas dos clientes',
@@ -59,6 +65,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Landing page',
     titulo: 'Landing page de alta conversão',
     subtitulo: 'Página focada em uma oferta, pronta para anúncios e captação de leads.',
+    necessidade: 'uma página focada em transformar visitantes em contatos e vendas',
+    entrega: 'a landing page',
     objetivos: ['Converter visitantes em contatos ou vendas', 'Apoiar campanhas de anúncios (Google e Meta)', 'Comunicar a oferta de forma clara e direta'],
     sugestoes: ['Medir conversões com Meta Pixel e Google Ads', 'Testar versões diferentes da página (A/B)', 'Integrar os leads ao CRM'],
     escopo: [
@@ -81,6 +89,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Loja virtual',
     titulo: 'Loja virtual',
     subtitulo: 'E-commerce completo para vender on-line com pagamento e frete integrados.',
+    necessidade: 'uma loja virtual completa e segura para vender on-line',
+    entrega: 'a loja virtual',
     objetivos: ['Vender on-line 24 horas por dia', 'Oferecer uma compra simples e segura', 'Aparecer no Google com as páginas de produto'],
     sugestoes: ['Recuperar carrinhos abandonados', 'Integrar com o estoque/ERP', 'Vender também pelo Instagram e Google Shopping'],
     escopo: [
@@ -103,6 +113,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Sistema web',
     titulo: 'Sistema web sob medida',
     subtitulo: 'Plataforma para organizar processos, dados e equipe em um só lugar.',
+    necessidade: 'um sistema feito sob medida para organizar processos e informações',
+    entrega: 'o sistema web',
     objetivos: ['Centralizar processos que hoje estão em planilhas e mensagens', 'Dar visão em tempo real dos números do negócio', 'Reduzir trabalho manual e retrabalho da equipe'],
     sugestoes: ['Controlar acessos por perfil de usuário', 'Gerar relatórios em PDF e Excel', 'Integrar com sistemas já usados pela empresa', 'Funcionar bem no celular'],
     escopo: [
@@ -125,6 +137,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Aplicativo',
     titulo: 'Aplicativo mobile',
     subtitulo: 'App para iOS e Android, do protótipo à publicação nas lojas.',
+    necessidade: 'um aplicativo próprio no celular dos clientes',
+    entrega: 'o aplicativo',
     objetivos: ['Estar no celular do cliente com a marca da empresa', 'Oferecer uma experiência simples e rápida', 'Publicar na App Store e no Google Play'],
     sugestoes: ['Enviar notificações para os usuários', 'Receber pagamentos dentro do app', 'Acompanhar uso e métricas do app'],
     escopo: [
@@ -147,6 +161,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'IA e automação',
     titulo: 'Inteligência artificial e automação',
     subtitulo: 'Assistente de IA e automações para atender mais rápido e economizar tempo da equipe.',
+    necessidade: 'inteligência artificial para atender mais rápido e automatizar tarefas',
+    entrega: 'a solução de IA e automação',
     objetivos: ['Responder clientes 24 horas por dia', 'Automatizar tarefas repetitivas da equipe', 'Manter um humano no controle quando necessário'],
     sugestoes: ['Atender pelo WhatsApp', 'Responder com base nos documentos da empresa', 'Registrar atendimentos no CRM'],
     escopo: [
@@ -169,6 +185,8 @@ export const PRODUTOS: Produto[] = [
     nome: 'Identidade visual',
     titulo: 'Identidade visual',
     subtitulo: 'Marca consistente para transmitir confiança em todos os pontos de contato.',
+    necessidade: 'uma identidade visual consistente, que transmita confiança',
+    entrega: 'a nova identidade visual',
     objetivos: ['Criar uma marca memorável e profissional', 'Padronizar a comunicação visual da empresa'],
     sugestoes: ['Aplicar a marca nas redes sociais', 'Criar papelaria e materiais impressos'],
     escopo: [
