@@ -91,6 +91,19 @@ $('logout').addEventListener('click', async () => {
   show('login');
 });
 
+/** Ícone de olho em linha (flat), na cor do texto do botão. */
+function iconeOlho() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  for (const [k, v] of Object.entries({ class: 'ad-ico', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' })) svg.setAttribute(k, v);
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z');
+  const circle = document.createElementNS(NS, 'circle');
+  for (const [k, v] of Object.entries({ cx: '12', cy: '12', r: '3' })) circle.setAttribute(k, v);
+  svg.append(path, circle);
+  return svg;
+}
+
 /* ================= LISTA ================= */
 async function loadList() {
   show('list');
@@ -110,7 +123,7 @@ async function loadList() {
       copy.addEventListener('click', () => copyLink(p.id, p.status));
       const dup = h('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Duplicar');
       dup.addEventListener('click', () => duplicate(p.id));
-      const ver = h('button', { class: 'btn btn--ghost btn--sm', type: 'button', title: 'Ver a proposta como o cliente vê' }, '👁 Visualizar');
+      const ver = h('button', { class: 'btn btn--ghost btn--sm', type: 'button', title: 'Ver a proposta como o cliente vê' }, iconeOlho(), 'Visualizar');
       ver.addEventListener('click', () => openViewerFor(p.id).catch(() => showToast('Não foi possível abrir a proposta')));
       const edit = h('a', { class: 'btn btn--sm', href: `/propostas/?id=${p.id}` }, 'Editar');
       edit.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });

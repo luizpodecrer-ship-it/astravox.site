@@ -76,7 +76,7 @@ import Logo from '../../components/Logo.astro';
         </select>
       </label>
       <div class="ad-toolbar__actions">
-        <button class="btn btn--ghost btn--sm" id="view" type="button" title="Ver a proposta como o cliente verá, antes de salvar">👁 Visualizar</button>
+        <button class="btn btn--ghost btn--sm" id="view" type="button" title="Ver a proposta como o cliente verá, antes de salvar"><svg class="ad-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Visualizar</button>
         <button class="btn btn--sm ad-save-btn" id="save" type="button" title="Salvar (Ctrl/⌘ + S)">Salvar</button>
         <button class="btn btn--accent btn--sm" id="send-wa" type="button">Enviar no WhatsApp</button>
         <button class="btn btn--ghost btn--sm" id="send-mail" type="button">Enviar por e-mail</button>
@@ -420,6 +420,7 @@ import Logo from '../../components/Logo.astro';
   .ad-step.is-current { position: relative; }
   .ad-step.is-current::before { content: ''; position: absolute; left: -16px; top: 4px; bottom: 18px; width: 3px; border-radius: 3px; background: var(--lime); }
   .ad-preview .pp-section.is-current { box-shadow: inset 4px 0 0 var(--lime); background: linear-gradient(90deg, rgba(209,255,43,.12), rgba(209,255,43,0) 55%); }
+  .ad-ico { width: 16px; height: 16px; flex: none; }
 </style>
 
 <script>
