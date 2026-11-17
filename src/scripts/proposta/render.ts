@@ -137,7 +137,14 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
 
   // ---------- Aceite ----------
   const wa = p.responsavel.whatsapp.replace(/\D/g, '');
-  const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(`Olá! Estou vendo a proposta "${p.titulo}" e tenho uma dúvida.`)}` : '';
+  const wame = (msg: string) => (wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msg)}` : '');
+  // Mensagem muda conforme o momento: dúvida antes de aprovar, confirmação depois.
+  const waDuvida = wame(`Olá! Estou vendo a proposta "${p.titulo}" e tenho uma dúvida.`);
+  const empresa = p.cliente.empresa ? ` da ${p.cliente.empresa}` : '';
+  const waAprovada = p.aceite
+    ? wame(`Olá! Aqui é ${p.aceite.nome}${empresa}. Acabei de aprovar a proposta "${p.titulo}". Vamos definir os próximos passos?`)
+    : '';
+  const waLink = waDuvida;
   const footer = h('footer', { class: 'pp-accept' });
   // append() escreveria "null" na tela: filtra os itens vazios.
   const add = (...nodes: (Node | null)[]) => footer.append(...nodes.filter((n): n is Node => n !== null));
@@ -145,7 +152,11 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
     add(
       h('div', { class: 'pp-accepted' }, h('span', { class: 'pp-check pp-check--big', 'aria-hidden': 'true' }, '✓'),
         h('div', {}, h('strong', {}, 'Proposta aceita'), h('p', {}, `por ${p.aceite.nome} em ${new Date(p.aceite.em).toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' })}`))),
-      waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'Falar com a Astravox no WhatsApp') : null,
+      waAprovada
+        ? h('div', { class: 'pp-next' },
+            h('p', {}, 'Avise a Astravox para combinarmos os próximos passos:'),
+            h('a', { class: 'pp-btn', href: waAprovada, target: '_blank', rel: 'noopener' }, 'Avisar a Astravox no WhatsApp'))
+        : null,
     );
   } else if (p.status === 'recusada') {
     add(h('p', { class: 'pp-closed' }, 'Esta proposta foi encerrada. Fale com a Astravox para uma nova versão.'), waLink ? h('a', { class: 'pp-btn pp-btn--ghost', href: waLink, target: '_blank', rel: 'noopener' }, 'WhatsApp') : null);

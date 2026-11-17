@@ -72,6 +72,8 @@
 .pp-accepted strong { font-size: 24px; font-weight: 500; letter-spacing: -.03em; }
 .pp-accepted p { color: var(--muted); margin-top: 2px; }
 .pp-closed { color: var(--muted); }
+.pp-next { display: grid; gap: 12px; justify-items: start; }
+.pp-next p { color: var(--muted); }
 .pp-empty { padding: 60px var(--pad); color: var(--muted); text-align: center; }
 .pp-sign { text-align: center; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 36px 0 10px; }
 
