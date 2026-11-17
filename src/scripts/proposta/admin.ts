@@ -192,9 +192,22 @@ async function ensureReady() {
   return !dirty;
 }
 
+/** "o novo site institucional" → "do novo site institucional"; "a landing page" → "da landing page". */
+const contrair = (t: string) => t.replace(/^o\s/i, 'do ').replace(/^a\s/i, 'da ').replace(/^os\s/i, 'dos ').replace(/^as\s/i, 'das ');
+
+/** "desenvolvimento do novo site institucional da CBN" (a partir dos produtos e da empresa). */
+function projetoTxt(p: Prop) {
+  const prods = PRODUTOS.filter((x) => p.produtos.includes(x.id));
+  const titulo = p.titulo.trim();
+  const oque = prods.length ? juntar(prods.map((x) => contrair(x.entrega))) : DEFAULT_TITLES.includes(titulo) ? 'do projeto' : `do projeto “${titulo}”`;
+  const empresa = p.cliente.empresa.trim();
+  return `desenvolvimento ${oque}${empresa ? ` da ${empresa}` : ''}`;
+}
+
 function mensagem() {
-  const nome = current!.cliente.nome.split(/[\s/]+/)[0];
-  return `Olá${nome ? `, ${nome}` : ''}! Segue a proposta da Astravox: ${clientUrl(current!.id)}\n\nVocê pode ver todos os detalhes e aprovar direto por esse link. Qualquer dúvida, estou à disposição.`;
+  const p = current!;
+  const nomes = primeirosNomes(p.cliente.nome);
+  return `Olá${nomes ? `, ${nomes}` : ''}! Segue a proposta para o ${projetoTxt(p)}:\n${clientUrl(p.id)}\n\nPor esse link você vê todos os detalhes e pode aprovar a proposta. Qualquer dúvida, estou à disposição.`;
 }
 
 $('send-wa').addEventListener('click', async () => {
@@ -208,7 +221,7 @@ $('send-mail').addEventListener('click', async () => {
   if (!current) return;
   if (!current.cliente.email) { showToast('Preencha o e-mail do cliente'); $('c-mail').focus(); return; }
   if (!(await ensureReady())) return;
-  const assunto = `Proposta Astravox: ${current.titulo}`;
+  const assunto = `Proposta para o ${projetoTxt(current)}`;
   location.href = `mailto:${encodeURIComponent(current.cliente.email)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem())}`;
 });
 

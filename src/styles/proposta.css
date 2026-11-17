@@ -106,3 +106,13 @@
   .pp-btn--ghost { justify-self: stretch; }
   .pp-next { justify-items: stretch; }
 }
+
+/* Topo: dados + botão Baixar PDF */
+.pp-cover__foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px 24px; flex-wrap: wrap; }
+.pp-cover__foot .pp-meta { flex: 1 1 auto; }
+.pp-pdf { font-family: var(--body-font); font-weight: 700; font-size: 14px; color: #fff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; min-height: 44px; padding: 0 20px; cursor: pointer; white-space: nowrap; transition: background .3s, color .3s, border-color .3s; }
+.pp-pdf:focus-visible { background: var(--lime); color: var(--ink); border-color: var(--lime); }
+@media (hover: hover) { .pp-pdf:hover { background: var(--lime); color: var(--ink); border-color: var(--lime); } }
+@media (max-width: 600px) { .pp-pdf { width: 100%; } }
+.pp-cover__foot { margin-top: 10px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.12); }
+.pp-cover__foot .pp-meta { margin: 0; padding: 0; border: 0; }

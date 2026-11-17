@@ -88,6 +88,13 @@ export function numeracao(p: Proposta): Record<SecKey, number | null> {
   return Object.fromEntries(SECOES.map((s) => [s.key, s.preenchida(p) ? ++n : null])) as Record<SecKey, number | null>;
 }
 
+/** Botão "Baixar PDF" do topo: usa a impressão do navegador ("Salvar como PDF"). */
+function pdfButton() {
+  const b = h('button', { type: 'button', class: 'pp-pdf no-print', title: 'Baixar a proposta em PDF' }, '↓ Baixar PDF');
+  b.addEventListener('click', () => window.print());
+  return b;
+}
+
 export type RenderOptions = {
   /** Mostra os botões de aceite (página do cliente). */
   interativo?: boolean;
@@ -114,7 +121,7 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
       h('div', { class: 'pp-cover__top' }, logo, h('span', { class: 'pp-tag' }, p.aceite ? 'Proposta aceita' : 'Proposta comercial')),
       h('h1', {}, p.titulo || 'Proposta'),
       p.subtitulo ? h('p', { class: 'pp-sub' }, p.subtitulo) : null,
-      meta,
+      h('div', { class: 'pp-cover__foot' }, meta, opts.interativo ? pdfButton() : null),
     ),
   );
 
