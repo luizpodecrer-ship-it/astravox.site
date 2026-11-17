@@ -76,6 +76,7 @@ import Logo from '../../components/Logo.astro';
         </select>
       </label>
       <div class="ad-toolbar__actions">
+        <button class="btn btn--ghost btn--sm" id="view" type="button" title="Ver a proposta como o cliente verá, antes de salvar">👁 Visualizar</button>
         <button class="btn btn--sm ad-save-btn" id="save" type="button" title="Salvar (Ctrl/⌘ + S)">Salvar</button>
         <button class="btn btn--accent btn--sm" id="send-wa" type="button">Enviar no WhatsApp</button>
         <button class="btn btn--ghost btn--sm" id="send-mail" type="button">Enviar por e-mail</button>
@@ -93,7 +94,7 @@ import Logo from '../../components/Logo.astro';
 
         <section class="ad-step">
           <h2><span>1</span> Cliente</h2>
-          <div class="row2">
+          <div class="row2 row2--client">
             <div class="field"><label for="c-nome">Nome</label><input id="c-nome" data-path="cliente.nome" placeholder="Maria Souza" /></div>
             <div class="field"><label for="c-emp">Empresa</label><input id="c-emp" data-path="cliente.empresa" placeholder="Clínica Bem-Estar" /></div>
             <div class="field"><label for="c-wa">WhatsApp</label><input id="c-wa" data-path="cliente.whatsapp" data-mask="phone" inputmode="tel" placeholder="(65) 99999-0000" /></div>
@@ -159,9 +160,34 @@ import Logo from '../../components/Logo.astro';
           <button class="btn btn--ghost btn--sm ad-del" type="button" id="delete">Apagar proposta</button>
         </div>
       </form>
-      <div class="ad-preview" id="preview" aria-label="Prévia da proposta"></div>
+      <aside class="ad-side" aria-label="Prévia da proposta">
+        <div class="ad-side__bar">
+          <span class="ad-side__label"><i></i> Prévia ao vivo</span>
+          <span class="ad-side__actions">
+            <button type="button" class="ad-link" data-open-viewer>Tela cheia</button>
+            <button type="button" class="ad-link" id="toggle-preview">Ocultar prévia</button>
+          </span>
+        </div>
+        <div class="ad-preview" id="preview"></div>
+      </aside>
+      <button type="button" class="ad-show-preview" id="show-preview" hidden>Mostrar prévia</button>
     </div>
   </main>
+
+  <!-- VISUALIZAR: a proposta como o cliente verá, antes de salvar -->
+  <div class="ad-viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title" hidden>
+    <div class="ad-viewer__bar">
+      <div>
+        <strong id="viewer-title">Visualizando como o cliente verá</strong>
+        <span class="ad-viewer__state" id="viewer-state"></span>
+      </div>
+      <div class="ad-viewer__actions">
+        <button class="btn btn--accent btn--sm" id="viewer-save" type="button">Salvar</button>
+        <button class="btn btn--light btn--sm" id="viewer-close" type="button">Fechar (Esc)</button>
+      </div>
+    </div>
+    <div class="ad-viewer__page" id="viewer-page"></div>
+  </div>
 
   <div class="pv-toast" id="toast" role="status"></div>
 </App>
@@ -254,15 +280,19 @@ import Logo from '../../components/Logo.astro';
   .ad-tabs { display: none; width: 100%; background: var(--soft); border-radius: 999px; padding: 4px; }
   .ad-tabs button { flex: 1; padding: 8px; border-radius: 999px; font-size: 14px; }
   .ad-tabs button[aria-selected='true'] { background: var(--ink); color: #fff; }
-  .ad-split { display: grid; grid-template-columns: minmax(360px, 460px) 1fr; align-items: start; }
-  .ad-form { padding: 20px; display: grid; gap: 14px; border-right: 1px solid var(--line); background: #fff; min-height: calc(100svh - 120px); }
+  .ad-split { display: grid; grid-template-columns: minmax(520px, 1.2fr) minmax(360px, 1fr); align-items: start; }
+  .ad-editor[data-preview='off'] .ad-split { grid-template-columns: minmax(0, 900px); justify-content: center; }
+  .ad-editor[data-preview='off'] .ad-side { display: none; }
+  .ad-editor[data-preview='off'] .ad-form { border-right: 0; border-left: 0; }
+  .ad-form { padding: 28px clamp(20px, 3vw, 44px); display: grid; gap: 18px; border-right: 1px solid var(--line); background: #fff; min-height: calc(100svh - 120px); }
   .ad-form fieldset { border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 16px; margin: 0; display: grid; gap: 10px; }
   .ad-form legend { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 6px; }
   .ad-form legend small { text-transform: none; letter-spacing: 0; }
   .ad-form .field input, .ad-form .field textarea, .ad-form .field select { padding: 10px 12px; font-size: 15px; border-radius: 10px; }
   .ad-form .field textarea { min-height: 0; }
   .ad-form .field label { font-size: 13px; font-weight: 500; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .row2--client { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   .ad-rows { display: grid; gap: 8px; }
   .ad-row input, .ad-row textarea { font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; width: 100%; min-width: 0; }
   .ad-row textarea { resize: none; overflow: hidden; line-height: 1.4; display: block; }
@@ -276,14 +306,37 @@ import Logo from '../../components/Logo.astro';
   .ad-info:empty { display: none; }
   .ad-danger { display: flex; gap: 8px; justify-content: space-between; padding-top: 6px; }
   .ad-del { color: #b3261e; }
-  .ad-preview { padding: 20px; position: sticky; top: 122px; max-height: calc(100svh - 122px); overflow: auto; }
+  .ad-side { position: sticky; top: 122px; height: calc(100svh - 122px); display: flex; flex-direction: column; }
+  .ad-side__bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 20px 0; }
+  .ad-side__label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+  .ad-side__label i { width: 7px; height: 7px; border-radius: 50%; background: #3ad29f; box-shadow: 0 0 0 4px rgba(58,210,159,.18); }
+  .ad-side__actions { display: flex; gap: 14px; }
+  .ad-link { font-size: 13px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 6px 0; }
+  .ad-link:hover { color: var(--hot); }
+  .ad-preview { padding: 12px 20px 20px; overflow: auto; flex: 1; }
+  /* Prévia em miniatura: mesma proposta, em escala menor */
+  .ad-preview .pp { zoom: .68; }
+  .ad-show-preview { position: fixed; right: 18px; bottom: 18px; z-index: 25; background: var(--ink); color: #fff; border: 0; border-radius: 999px; padding: 12px 18px; font: inherit; font-size: 14px; box-shadow: 0 12px 30px -10px rgba(0,0,0,.4); }
+  .ad-viewer { position: fixed; inset: 0; z-index: 60; background: rgba(11,11,16,.72); backdrop-filter: blur(6px); display: flex; flex-direction: column; }
+  .ad-viewer__bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; background: var(--ink); color: #fff; }
+  .ad-viewer__bar strong { font-weight: 500; }
+  .ad-viewer__state { margin-left: 12px; font-family: var(--mono); font-size: 11px; color: var(--muted-dark); }
+  .ad-viewer__state.is-dirty { color: var(--lime); }
+  .ad-viewer__actions { display: flex; gap: 8px; }
+  .ad-viewer__page { flex: 1; overflow: auto; background: #fff; padding: 20px 8px 60px; }
+  body.has-viewer { overflow: hidden; }
   .ad-preview .pp { background: #fff; border-radius: var(--radius); padding: 8px 8px 30px; box-shadow: 0 30px 60px -40px rgba(0,0,0,.35); }
   @media (max-width: 1000px) {
     .ad-tabs { display: flex; }
     .ad-split { grid-template-columns: 1fr; }
     .ad-form { border-right: 0; }
-    .ad-preview { position: static; max-height: none; padding: 10px; }
-    .ad-editor[data-tab='form'] .ad-preview, .ad-editor[data-tab='preview'] .ad-form { display: none; }
+    .ad-side { position: static; height: auto; }
+    .ad-side__bar { display: none; }
+    .ad-preview { padding: 10px; }
+    .ad-preview .pp { zoom: 1; }
+    .ad-editor[data-preview='off'] .ad-side { display: flex; }
+    .ad-show-preview { display: none; }
+    .ad-editor[data-tab='form'] .ad-side, .ad-editor[data-tab='preview'] .ad-form { display: none !important; }
     .ad-toolbar { top: 61px; }
   }
   .pv-toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 30px); opacity: 0; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; transition: all .4s var(--ease); pointer-events: none; z-index: 50; }

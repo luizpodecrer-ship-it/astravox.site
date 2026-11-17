@@ -550,6 +550,48 @@ $('delete').addEventListener('click', async () => {
   go(null);
 });
 
+/* ---------- Visualizar (tela cheia, antes de salvar) ---------- */
+const viewer = $('viewer');
+let lastFocus: HTMLElement | null = null;
+function openViewer() {
+  if (!current) return;
+  lastFocus = document.activeElement as HTMLElement | null;
+  $('viewer-page').replaceChildren(renderProposta(current, { interativo: false }));
+  updateViewerState();
+  viewer.hidden = false;
+  document.body.classList.add('has-viewer');
+  $('viewer-page').scrollTop = 0;
+  $('viewer-close').focus();
+}
+function closeViewer() {
+  viewer.hidden = true;
+  document.body.classList.remove('has-viewer');
+  lastFocus?.focus();
+}
+function updateViewerState() {
+  const st = $('viewer-state');
+  st.textContent = dirty ? '● Alterações ainda não salvas: o cliente ainda vê a versão anterior' : '✓ Salvo: é isso que o cliente vê';
+  st.classList.toggle('is-dirty', dirty);
+  ($('viewer-save') as HTMLButtonElement).hidden = !dirty;
+}
+$('view').addEventListener('click', openViewer);
+document.querySelectorAll('[data-open-viewer]').forEach((b) => b.addEventListener('click', openViewer));
+$('viewer-close').addEventListener('click', closeViewer);
+$('viewer-save').addEventListener('click', async () => { await save(); updateViewerState(); });
+viewer.addEventListener('click', (e) => { if (e.target === viewer) closeViewer(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !viewer.hidden) closeViewer(); });
+
+/* ---------- Ocultar / mostrar a prévia lateral ---------- */
+const PREVIEW_KEY = 'ax-editor-preview';
+function setPreview(on: boolean) {
+  views.editor.dataset.preview = on ? 'on' : 'off';
+  $('show-preview').hidden = on;
+  try { localStorage.setItem(PREVIEW_KEY, on ? 'on' : 'off'); } catch {}
+}
+$('toggle-preview').addEventListener('click', () => setPreview(false));
+$('show-preview').addEventListener('click', () => setPreview(true));
+setPreview((() => { try { return localStorage.getItem(PREVIEW_KEY) !== 'off'; } catch { return true; } })());
+
 // Abas Editar/Prévia no celular
 const editorEl = views.editor;
 editorEl.dataset.tab = 'form';
