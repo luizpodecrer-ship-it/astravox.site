@@ -1,0 +1,121 @@
+---
+// LAYOUT EM APROVAÇÃO: os projetos abaixo são exemplos de preenchimento, não trabalhos reais.
+// Antes de publicar: trocar por projetos reais (src/data), tirar o noindex e incluir no menu.
+import Base from '../layouts/Base.astro';
+import Mock from '../components/Mock.astro';
+import CTA from '../components/CTA.astro';
+
+type Kind = 'site' | 'dash' | 'phone' | 'chat' | 'ux' | 'brand';
+const SEGMENTOS = [
+  { id: 'sites', nome: 'Sites' },
+  { id: 'sistemas', nome: 'Sistemas' },
+  { id: 'apps', nome: 'Aplicativos' },
+  { id: 'portais', nome: 'Portais e blogs' },
+  { id: 'ia', nome: 'IA e automação' },
+];
+const PROJETOS: { seg: string; titulo: string; cliente: string; ano: string; texto: string; entregas: string[]; kind: Kind; hue: number; url?: string }[] = [
+  { seg: 'sites', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Design', 'Desenvolvimento', 'SEO'], kind: 'site', hue: 72, url: '#' },
+  { seg: 'sistemas', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Painel', 'Relatórios', 'Permissões'], kind: 'dash', hue: 190 },
+  { seg: 'portais', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Portal', 'Painel de publicação'], kind: 'site', hue: 150, url: '#' },
+  { seg: 'apps', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['iOS', 'Android'], kind: 'phone', hue: 120 },
+  { seg: 'sites', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Landing page', 'Anúncios'], kind: 'site', hue: 95, url: '#' },
+  { seg: 'ia', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Assistente', 'WhatsApp'], kind: 'chat', hue: 85 },
+  { seg: 'sistemas', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Gestão', 'Financeiro'], kind: 'dash', hue: 170 },
+];
+const nomeSeg = (id: string) => SEGMENTOS.find((s) => s.id === id)!.nome;
+const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
+---
+<Base title="Projetos | Astravox" description="Projetos de sites, sistemas, aplicativos, portais e IA desenvolvidos pela Astravox." headerVariant="light" noindex breadcrumb={[{ name: 'Projetos', path: '/projetos/' }]}>
+  <section class="page-hero" style="padding-bottom:40px">
+    <div class="wrap">
+      <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Projetos</li></ol>
+      <span class="tag">Projetos</span>
+      <h1 class="display" data-split>Projetos que<br />saíram do papel.</h1>
+      <p class="lead" data-reveal>Sites, sistemas, aplicativos e soluções com IA que desenhamos e desenvolvemos. Filtre pelo tipo de projeto que você procura.</p>
+    </div>
+  </section>
+
+  <div class="pj-filter" id="pj-filter">
+    <div class="wrap pj-filter__in" role="group" aria-label="Filtrar projetos por segmento">
+      <button type="button" class="pj-chip" data-seg="todos" aria-pressed="true">Todos <sup>{PROJETOS.length}</sup></button>
+      {SEGMENTOS.filter((s) => conta(s.id)).map((s) => (
+        <button type="button" class="pj-chip" data-seg={s.id} aria-pressed="false">{s.nome} <sup>{conta(s.id)}</sup></button>
+      ))}
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:36px">
+    <div class="wrap pj-grid" id="pj-grid">
+      {PROJETOS.map((p, i) => (
+        <article class:list={['pj-card', i === 0 && 'pj-card--destaque']} data-seg={p.seg}>
+          <div class="pj-card__media">
+            <span class="tag tag--light">{nomeSeg(p.seg)}</span>
+            <div class="pj-card__art"><Mock kind={p.kind} hue={p.hue} /></div>
+            {p.url && <a class="pj-card__live" href={p.url} target="_blank" rel="noopener">Ver no ar ↗</a>}
+          </div>
+          <div class="pj-card__body">
+            <div class="pj-card__top"><h2>{p.titulo}</h2><span class="pj-card__meta">{p.cliente} · {p.ano}</span></div>
+            <p>{p.texto}</p>
+            <ul class="pj-card__tags" role="list">{p.entregas.map((e) => <li>{e}</li>)}</ul>
+          </div>
+        </article>
+      ))}
+    </div>
+    <p class="wrap pj-empty" id="pj-empty" hidden>Ainda não há projetos publicados neste segmento.</p>
+  </section>
+  <CTA title="Quer ver o seu projeto aqui?" />
+</Base>
+
+<style>
+  .pj-filter { position: sticky; top: 78px; z-index: 20; padding: 10px 0; background: rgba(255,255,255,.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .pj-filter__in { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .pj-filter__in::-webkit-scrollbar { display: none; }
+  .pj-chip { flex: none; font-size: 15px; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line); background: #fff; transition: background .25s, color .25s, border-color .25s; }
+  .pj-chip sup { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: 2px; }
+  .pj-chip:hover { border-color: var(--ink); }
+  .pj-chip[aria-pressed='true'] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .pj-chip[aria-pressed='true'] sup { color: var(--lime); }
+  .pj-grid { display: grid; gap: 36px 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+  .pj-card[hidden] { display: none; }
+  .pj-card__media { position: relative; aspect-ratio: 4/3; border-radius: var(--radius-sm); overflow: hidden; background: var(--soft); border: 1px solid var(--line); }
+  .pj-card__media .tag { position: absolute; top: 14px; left: 14px; z-index: 3; }
+  .pj-card__art { position: absolute; inset: 0; transition: transform 1s var(--ease); }
+  .pj-card:hover .pj-card__art { transform: scale(1.04); }
+  .pj-card__live { position: absolute; right: 14px; bottom: 14px; z-index: 3; background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; padding: 9px 15px; border-radius: 999px; transition: background .25s, color .25s; }
+  .pj-card__live:hover { background: var(--lime); color: var(--ink); }
+  .pj-card__body { padding-top: 16px; display: grid; gap: 8px; }
+  .pj-card__top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  .pj-card h2 { font-size: 21px; font-weight: 500; letter-spacing: -.025em; }
+  .pj-card__meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .pj-card p { font-size: 14.5px; color: var(--muted); }
+  .pj-card__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .pj-card__tags li { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--soft); border: 1px solid var(--line); }
+  .pj-empty { color: var(--muted); text-align: center; padding-block: 60px; }
+  @media (min-width: 900px) {
+    .pj-card--destaque { grid-column: span 2; }
+    .pj-card--destaque .pj-card__media { aspect-ratio: 16/8; }
+    .pj-card--destaque h2 { font-size: 28px; }
+  }
+</style>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.pj-chip');
+  const cards = document.querySelectorAll<HTMLElement>('.pj-card');
+  const empty = document.getElementById('pj-empty')!;
+  function filtrar(seg: string, atualizarUrl = true) {
+    let visiveis = 0;
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.seg === seg)));
+    cards.forEach((c) => {
+      const mostra = seg === 'todos' || c.dataset.seg === seg;
+      c.hidden = !mostra;
+      // o destaque largo só vale na visão "Todos"
+      if (mostra) { c.classList.toggle('pj-card--destaque', visiveis === 0 && seg === 'todos'); visiveis++; }
+    });
+    empty.hidden = visiveis > 0;
+    if (atualizarUrl) history.replaceState(null, '', seg === 'todos' ? location.pathname : `#${seg}`);
+  }
+  chips.forEach((c) => c.addEventListener('click', () => filtrar(c.dataset.seg!)));
+  // Link direto para um segmento: /projetos/#sistemas
+  const inicial = location.hash.slice(1);
+  if ([...chips].some((c) => c.dataset.seg === inicial)) filtrar(inicial, false);
+</script>
