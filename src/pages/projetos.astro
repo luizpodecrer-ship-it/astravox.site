@@ -7,7 +7,7 @@ import { SEGMENTOS, PROJETOS } from '../data/projetos';
 const vazio = PROJETOS.length === 0;
 
 const nomeSeg = (id: string) => SEGMENTOS.find((s) => s.id === id)!.nome;
-const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
+const conta = (id: string) => PROJETOS.filter((p) => p.segs.includes(id)).length;
 ---
 <Base title="Projetos | Astravox" description="Projetos de sites, sistemas, aplicativos, portais e IA desenvolvidos pela Astravox." headerVariant="light" noindex={vazio} breadcrumb={[{ name: 'Projetos', path: '/projetos/' }]}>
   <section class="page-hero" style="padding-bottom:40px">
@@ -42,14 +42,14 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
   <section class="section" style="padding-top:36px">
     <div class="wrap pj-grid" id="pj-grid">
       {PROJETOS.map((p, i) => (
-        <article class:list={['pj-card', i === 0 && 'pj-card--destaque']} data-seg={p.seg}>
+        <article class:list={['pj-card', i === 0 && 'pj-card--destaque']} data-segs={p.segs.join(' ')}>
           <div class="pj-card__media">
-            <span class="tag tag--light">{nomeSeg(p.seg)}</span>
+            <span class="tag tag--light">{nomeSeg(p.segs[0])}</span>
             <div class="pj-card__art">{p.imagem ? <img src={p.imagem} alt={`Tela do projeto ${p.titulo}`} loading="lazy" decoding="async" /> : <Mock kind={p.kind ?? 'site'} hue={p.hue ?? 72} />}</div>
             {p.url && <a class="pj-card__live" href={p.url} target="_blank" rel="noopener">Ver no ar ↗</a>}
           </div>
           <div class="pj-card__body">
-            <div class="pj-card__top"><h2>{p.titulo}</h2><span class="pj-card__meta">{p.cliente} · {p.ano}</span></div>
+            <div class="pj-card__top"><h2>{p.titulo}</h2><span class="pj-card__meta">{[p.cliente, p.ano].filter(Boolean).join(' · ')}</span></div>
             <p>{p.texto}</p>
             <ul class="pj-card__tags" role="list">{p.entregas.map((e) => <li>{e}</li>)}</ul>
           </div>
@@ -81,7 +81,7 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
   .pj-card__live { position: absolute; right: 14px; bottom: 14px; z-index: 3; background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; padding: 9px 15px; border-radius: 999px; transition: background .25s, color .25s; }
   .pj-card__live:hover { background: var(--lime); color: var(--ink); }
   .pj-card__body { padding-top: 16px; display: grid; gap: 8px; }
-  .pj-card__top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  .pj-card__top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 14px; flex-wrap: wrap; }
   .pj-card h2 { font-size: 21px; font-weight: 500; letter-spacing: -.025em; }
   .pj-card__meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
   .pj-card p { font-size: 14.5px; color: var(--muted); }
@@ -108,7 +108,7 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
     let visiveis = 0;
     chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.seg === seg)));
     cards.forEach((c) => {
-      const mostra = seg === 'todos' || c.dataset.seg === seg;
+      const mostra = seg === 'todos' || (c.dataset.segs ?? '').split(' ').includes(seg);
       c.hidden = !mostra;
       // o destaque largo só vale na visão "Todos"
       if (mostra) { c.classList.toggle('pj-card--destaque', visiveis === 0 && seg === 'todos'); visiveis++; }
