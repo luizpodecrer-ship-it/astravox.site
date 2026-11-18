@@ -127,11 +127,22 @@ async function loadList() {
       ver.addEventListener('click', () => openViewerFor(p.id).catch(() => showToast('Não foi possível abrir a proposta')));
       const edit = h('a', { class: 'btn btn--sm', href: `/propostas/?id=${p.id}` }, 'Editar');
       edit.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
+      const del = h('button', { class: 'btn btn--ghost btn--sm ad-del', type: 'button', title: 'Excluir esta proposta' }, 'Excluir');
+      del.addEventListener('click', async () => {
+        const quem = [p.cliente.nome, p.cliente.empresa].filter(Boolean).join(' · ');
+        if (!confirm(`Excluir a proposta "${p.titulo || 'Sem título'}"${quem ? ` (${quem})` : ''}? O link do cliente deixará de funcionar. Isso não pode ser desfeito.`)) return;
+        try {
+          await api(`/api/admin/propostas/${p.id}`, { method: 'DELETE' });
+          try { localStorage.removeItem(`ax-proposta-${p.id}`); } catch {}
+          showToast('Proposta excluída');
+          loadList();
+        } catch { showToast('Não foi possível excluir agora'); }
+      });
       const title = h('a', { href: `/propostas/?id=${p.id}` }, p.titulo || 'Sem título');
       title.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
       return h('article', { class: 'ad-card' },
         h('h2', {}, title),
-        h('div', { class: 'ad-card__actions' }, ver, edit, copy, dup),
+        h('div', { class: 'ad-card__actions' }, ver, edit, copy, dup, del),
         h('div', { class: 'ad-card__meta' },
           h('span', { class: `ad-pill ad-pill--${p.status}` }, STATUS[p.status]),
           [p.cliente.nome, p.cliente.empresa].filter(Boolean).join(' · ') || 'Sem cliente',
