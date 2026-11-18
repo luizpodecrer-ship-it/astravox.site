@@ -1,40 +1,35 @@
 ---
-// LAYOUT EM APROVAÇÃO: os projetos abaixo são exemplos de preenchimento, não trabalhos reais.
-// Antes de publicar: trocar por projetos reais (src/data), tirar o noindex e incluir no menu.
+// Projetos por segmento. Os dados ficam em src/data/projetos.ts (só trabalhos reais).
 import Base from '../layouts/Base.astro';
 import Mock from '../components/Mock.astro';
 import CTA from '../components/CTA.astro';
+import { SEGMENTOS, PROJETOS } from '../data/projetos';
+const vazio = PROJETOS.length === 0;
 
-type Kind = 'site' | 'dash' | 'phone' | 'chat' | 'ux' | 'brand';
-const SEGMENTOS = [
-  { id: 'sites', nome: 'Sites' },
-  { id: 'sistemas', nome: 'Sistemas' },
-  { id: 'apps', nome: 'Aplicativos' },
-  { id: 'portais', nome: 'Portais e blogs' },
-  { id: 'ia', nome: 'IA e automação' },
-];
-const PROJETOS: { seg: string; titulo: string; cliente: string; ano: string; texto: string; entregas: string[]; kind: Kind; hue: number; url?: string }[] = [
-  { seg: 'sites', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Design', 'Desenvolvimento', 'SEO'], kind: 'site', hue: 72, url: '#' },
-  { seg: 'sistemas', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Painel', 'Relatórios', 'Permissões'], kind: 'dash', hue: 190 },
-  { seg: 'portais', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2026', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Portal', 'Painel de publicação'], kind: 'site', hue: 150, url: '#' },
-  { seg: 'apps', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['iOS', 'Android'], kind: 'phone', hue: 120 },
-  { seg: 'sites', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Landing page', 'Anúncios'], kind: 'site', hue: 95, url: '#' },
-  { seg: 'ia', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Assistente', 'WhatsApp'], kind: 'chat', hue: 85 },
-  { seg: 'sistemas', titulo: 'Nome do projeto', cliente: 'Cliente exemplo', ano: '2025', texto: 'Uma frase sobre o desafio do cliente e o que foi entregue.', entregas: ['Gestão', 'Financeiro'], kind: 'dash', hue: 170 },
-];
 const nomeSeg = (id: string) => SEGMENTOS.find((s) => s.id === id)!.nome;
 const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
 ---
-<Base title="Projetos | Astravox" description="Projetos de sites, sistemas, aplicativos, portais e IA desenvolvidos pela Astravox." headerVariant="light" noindex breadcrumb={[{ name: 'Projetos', path: '/projetos/' }]}>
+<Base title="Projetos | Astravox" description="Projetos de sites, sistemas, aplicativos, portais e IA desenvolvidos pela Astravox." headerVariant="light" noindex={vazio} breadcrumb={[{ name: 'Projetos', path: '/projetos/' }]}>
   <section class="page-hero" style="padding-bottom:40px">
     <div class="wrap">
       <ol class="breadcrumb" role="list"><li><a href="/">Início</a></li><li>Projetos</li></ol>
       <span class="tag">Projetos</span>
       <h1 class="display" data-split>Projetos que<br />saíram do papel.</h1>
-      <p class="lead" data-reveal>Sites, sistemas, aplicativos e soluções com IA que desenhamos e desenvolvemos. Filtre pelo tipo de projeto que você procura.</p>
+      <p class="lead" data-reveal>{vazio ? 'Estamos preparando esta página com os nossos trabalhos mais recentes em sites, sistemas, aplicativos e soluções com IA.' : 'Sites, sistemas, aplicativos e soluções com IA que desenhamos e desenvolvemos. Filtre pelo tipo de projeto que você procura.'}</p>
     </div>
   </section>
 
+  {vazio ? (
+    <section class="section" style="padding-top:20px">
+      <div class="wrap pj-soon">
+        <span class="tag">Em breve</span>
+        <p>Os projetos serão publicados aqui, organizados por segmento:</p>
+        <ul role="list">{SEGMENTOS.map((s) => <li>{s.nome}</li>)}</ul>
+        <a class="link-u" href="/servicos/">Enquanto isso, conheça os nossos serviços</a>
+      </div>
+    </section>
+  ) : (
+    <Fragment>
   <div class="pj-filter" id="pj-filter">
     <div class="wrap pj-filter__in" role="group" aria-label="Filtrar projetos por segmento">
       <button type="button" class="pj-chip" data-seg="todos" aria-pressed="true">Todos <sup>{PROJETOS.length}</sup></button>
@@ -50,7 +45,7 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
         <article class:list={['pj-card', i === 0 && 'pj-card--destaque']} data-seg={p.seg}>
           <div class="pj-card__media">
             <span class="tag tag--light">{nomeSeg(p.seg)}</span>
-            <div class="pj-card__art"><Mock kind={p.kind} hue={p.hue} /></div>
+            <div class="pj-card__art">{p.imagem ? <img src={p.imagem} alt={`Tela do projeto ${p.titulo}`} loading="lazy" decoding="async" /> : <Mock kind={p.kind ?? 'site'} hue={p.hue ?? 72} />}</div>
             {p.url && <a class="pj-card__live" href={p.url} target="_blank" rel="noopener">Ver no ar ↗</a>}
           </div>
           <div class="pj-card__body">
@@ -63,6 +58,8 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
     </div>
     <p class="wrap pj-empty" id="pj-empty" hidden>Ainda não há projetos publicados neste segmento.</p>
   </section>
+    </Fragment>
+  )}
   <CTA title="Quer ver o seu projeto aqui?" />
 </Base>
 
@@ -90,6 +87,11 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
   .pj-card p { font-size: 14.5px; color: var(--muted); }
   .pj-card__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
   .pj-card__tags li { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--soft); border: 1px solid var(--line); }
+  .pj-card__art img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .pj-soon { display: grid; gap: 18px; justify-items: start; padding: 36px; border: 1px dashed #cfcfd8; border-radius: var(--radius); background: var(--soft); }
+  .pj-soon p { font-size: 18px; }
+  .pj-soon ul { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pj-soon li { padding: 9px 16px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 15px; }
   .pj-empty { color: var(--muted); text-align: center; padding-block: 60px; }
   @media (min-width: 900px) {
     .pj-card--destaque { grid-column: span 2; }
@@ -101,7 +103,7 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
 <script>
   const chips = document.querySelectorAll<HTMLButtonElement>('.pj-chip');
   const cards = document.querySelectorAll<HTMLElement>('.pj-card');
-  const empty = document.getElementById('pj-empty')!;
+  const empty = document.getElementById('pj-empty');
   function filtrar(seg: string, atualizarUrl = true) {
     let visiveis = 0;
     chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.seg === seg)));
@@ -111,7 +113,7 @@ const conta = (id: string) => PROJETOS.filter((p) => p.seg === id).length;
       // o destaque largo só vale na visão "Todos"
       if (mostra) { c.classList.toggle('pj-card--destaque', visiveis === 0 && seg === 'todos'); visiveis++; }
     });
-    empty.hidden = visiveis > 0;
+    if (empty) empty.hidden = visiveis > 0;
     if (atualizarUrl) history.replaceState(null, '', seg === 'todos' ? location.pathname : `#${seg}`);
   }
   chips.forEach((c) => c.addEventListener('click', () => filtrar(c.dataset.seg!)));

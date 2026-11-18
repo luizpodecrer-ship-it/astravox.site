@@ -43,13 +43,12 @@ export const SITE = {
 
 export const hasWhatsapp = () => SITE.whatsapp.length >= 12;
 
-export const NAV_CASES = { label: 'Cases', href: '/cases/' };
-
 export const whatsappLink = (msg = 'Olá, Astravox! Quero conversar sobre um projeto.') =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(msg)}`;
 
 export const NAV = [
   { label: 'Serviços', href: '/servicos/' },
+  { label: 'Projetos', href: '/projetos/' },
   { label: 'Sobre', href: '/sobre/' },
   { label: 'Contato', href: '/contato/' },
 ];
@@ -243,5 +242,4 @@ export const FAQ = [
   { q: 'O código e os arquivos ficam comigo?', a: 'Sim. Ao final do projeto você é dono do código, dos arquivos de design e de todos os acessos.' },
 ];
 
-/** Menu: "Cases" só aparece quando houver cases reais cadastrados. */
-export const MENU = CASES.length ? [NAV[0], NAV_CASES, ...NAV.slice(1)] : NAV;
+export const MENU = NAV;
