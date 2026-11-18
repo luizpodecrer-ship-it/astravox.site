@@ -645,14 +645,16 @@ $('duplicate').addEventListener('click', async () => {
   if (dirty) await save();
   duplicate(current.id);
 });
-$('delete').addEventListener('click', async () => {
-  if (!current || !confirm(`Apagar a proposta "${current.titulo}"? O link do cliente deixará de funcionar. Isso não pode ser desfeito.`)) return;
+async function excluirAtual() {
+  if (!current || !confirm(`Excluir a proposta "${current.titulo}"? O link do cliente deixará de funcionar. Isso não pode ser desfeito.`)) return;
   await api(`/api/admin/propostas/${current.id}`, { method: 'DELETE' });
   try { localStorage.removeItem(backupKey(current.id)); } catch {}
   dirty = false;
-  showToast('Proposta apagada');
+  showToast('Proposta excluída');
   go(null);
-});
+}
+$('delete').addEventListener('click', excluirAtual);
+$('delete-top').addEventListener('click', excluirAtual);
 
 /* ---------- Visualizar (tela cheia, antes de salvar) ---------- */
 const viewer = $('viewer');
