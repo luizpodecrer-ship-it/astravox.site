@@ -116,3 +116,9 @@
 @media (max-width: 600px) { .pp-pdf { width: 100%; } }
 .pp-cover__foot { margin-top: 10px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.12); }
 .pp-cover__foot .pp-meta { margin: 0; padding: 0; border: 0; }
+
+/* Avaliar no Google (depois do aceite) */
+.pp-review { display: grid; gap: 12px; justify-items: start; padding-top: 18px; border-top: 1px solid var(--line); }
+.pp-review p { color: var(--muted); }
+.pp-stars { color: #e9b200; margin-right: 8px; font-size: 18px; line-height: 1; }
+@media (max-width: 600px) { .pp-review { justify-items: stretch; } }

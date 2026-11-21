@@ -1,6 +1,7 @@
 // Renderiza uma proposta em HTML seguro (todo texto entra via textContent, nunca innerHTML).
 // Usado pela página do cliente (/p/:id) e pela prévia ao vivo do editor.
 import { SYMBOL_PATH } from '../../data/logo';
+import { SITE } from '../../data/site';
 
 export type Proposta = {
   id: string;
@@ -181,6 +182,11 @@ export function renderProposta(p: Proposta, opts: RenderOptions = {}) {
         ? h('div', { class: 'pp-next' },
             h('p', {}, 'Avise a Astravox para combinarmos os próximos passos:'),
             h('a', { class: 'pp-btn', href: waAprovada, target: '_blank', rel: 'noopener' }, 'Avisar a Astravox no WhatsApp'))
+        : null,
+      SITE.reviewUrl
+        ? h('div', { class: 'pp-review' },
+            h('p', {}, 'Gostou de trabalhar com a gente? Sua avaliação ajuda outras empresas a conhecer a Astravox.'),
+            h('a', { class: 'pp-btn pp-btn--ghost', href: SITE.reviewUrl, target: '_blank', rel: 'noopener' }, h('span', { class: 'pp-stars', 'aria-hidden': 'true' }, '★'), 'Avaliar a Astravox no Google'))
         : null,
     );
   } else if (p.status === 'recusada') {

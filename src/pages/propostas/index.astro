@@ -56,6 +56,7 @@ import Logo from '../../components/Logo.astro';
     <div class="ad-list__head">
       <div><span class="tag">Painel</span><h1 class="h2" style="margin-top:16px">Suas propostas</h1></div>
       <div class="ad-list__actions">
+        <a class="btn btn--ghost" id="open-review" target="_blank" rel="noopener" title="Abre a página de avaliação da Astravox no Google"><span class="stars-g" aria-hidden="true">★</span>Avaliar no Google ↗</a>
         <button class="btn btn--ghost" id="test-aviso" type="button" title="Envia uma mensagem de teste para o seu WhatsApp">Testar aviso no WhatsApp</button>
         <button class="btn btn--accent" id="new-proposal" type="button">+ Nova proposta</button>
       </div>
@@ -91,7 +92,7 @@ import Logo from '../../components/Logo.astro';
     </div>
     <div class="ad-split">
       <form class="ad-form" id="editor-form" autocomplete="off">
-        <p class="ad-info" id="views-info"></p>
+        <div class="ad-info-row"><p class="ad-info" id="views-info"></p><button class="btn btn--accent btn--sm" id="ask-review" type="button" hidden>★ Pedir avaliação no Google</button></div>
 
         <p class="ad-group">Antes de começar</p>
 
@@ -283,6 +284,10 @@ import Logo from '../../components/Logo.astro';
   .ad-list { padding-top: 50px; padding-bottom: 80px; }
   .ad-list__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
   .ad-list__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stars-g { color: #e9b200; margin-right: 6px; }
+  .btn .stars-g { margin-right: -4px; }
+  .ad-info-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .ad-info-row .ad-info { flex: 1 1 260px; margin: 0; }
   .ad-cards { display: grid; gap: 12px; }
   .ad-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px 20px; display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: center; }
   .ad-card h2 { font-size: 18px; font-weight: 500; letter-spacing: -.02em; }

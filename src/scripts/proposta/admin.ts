@@ -1,9 +1,12 @@
 // Painel de propostas: login, lista e editor com salvamento automático e prévia ao vivo.
 import { renderProposta, brl, diasTxt, totalDias, numeracao, h, type Proposta, type SecKey } from './render';
 import { PRODUTOS, type Produto } from '../../data/produtos';
+import { SITE } from '../../data/site';
 
 type Prop = Proposta & { cliente: Proposta['cliente'] & { whatsapp: string; email: string }; produtos: string[]; notasInternas: string };
-type Resumo = Pick<Proposta, 'id' | 'titulo' | 'cliente' | 'status' | 'atualizadaEm' | 'aceite'> & {
+type Resumo = Pick<Proposta, 'id' | 'titulo' | 'status' | 'atualizadaEm' | 'aceite'> & {
+  cliente: Prop['cliente'];
+  produtos: string[];
   visualizacoes: { total: number; ultima: string | null };
 };
 
@@ -127,6 +130,8 @@ async function loadList() {
       ver.addEventListener('click', () => openViewerFor(p.id).catch(() => showToast('Não foi possível abrir a proposta')));
       const edit = h('a', { class: 'btn btn--sm', href: `/propostas/?id=${p.id}` }, 'Editar');
       edit.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
+      const aval = p.aceite ? h('button', { class: 'btn btn--accent btn--sm', type: 'button', title: 'Abre o WhatsApp do cliente com o link de avaliação no Google' }, '★ Pedir avaliação') : null;
+      aval?.addEventListener('click', () => pedirAvaliacao(p as unknown as Prop));
       const del = h('button', { class: 'btn btn--ghost btn--sm ad-del', type: 'button', title: 'Excluir esta proposta' }, 'Excluir');
       del.addEventListener('click', async () => {
         const quem = [p.cliente.nome, p.cliente.empresa].filter(Boolean).join(' · ');
@@ -142,7 +147,7 @@ async function loadList() {
       title.addEventListener('click', (e) => { e.preventDefault(); go(p.id); });
       return h('article', { class: 'ad-card' },
         h('h2', {}, title),
-        h('div', { class: 'ad-card__actions' }, ver, edit, copy, dup, del),
+        h('div', { class: 'ad-card__actions' }, aval, ver, edit, copy, dup, del),
         h('div', { class: 'ad-card__meta' },
           h('span', { class: `ad-pill ad-pill--${p.status}` }, STATUS[p.status]),
           [p.cliente.nome, p.cliente.empresa].filter(Boolean).join(' · ') || 'Sem cliente',
@@ -223,12 +228,23 @@ const contrair = (t: string) => t.replace(/^o\s/i, 'do ').replace(/^a\s/i, 'da '
 
 /** "desenvolvimento do novo site institucional da CBN" (a partir dos produtos e da empresa). */
 function projetoTxt(p: Prop) {
-  const prods = PRODUTOS.filter((x) => p.produtos.includes(x.id));
+  const prods = PRODUTOS.filter((x) => (p.produtos ?? []).includes(x.id));
   const titulo = p.titulo.trim();
   const oque = prods.length ? juntar(prods.map((x) => contrair(x.entrega))) : DEFAULT_TITLES.includes(titulo) ? 'do projeto' : `do projeto “${titulo}”`;
   const empresa = p.cliente.empresa.trim();
   return `desenvolvimento ${oque}${empresa ? ` da ${empresa}` : ''}`;
 }
+
+/* ---------- Avaliação no Google ---------- */
+function pedirAvaliacao(p: Prop) {
+  const nomes = primeirosNomes(p.cliente.nome);
+  const msg = `Olá${nomes ? `, ${nomes}` : ''}! Obrigado por confiar na Astravox para o ${projetoTxt(p)}. Se puder, deixe sua avaliação no Google. Leva menos de um minuto e ajuda muito:\n${SITE.reviewUrl}`;
+  const n = waNumber(p.cliente.whatsapp ?? '');
+  window.open(`https://wa.me/${n}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+  if (!n) showToast('Sem WhatsApp do cliente: escolha o contato no WhatsApp');
+}
+($('open-review') as HTMLAnchorElement).href = SITE.reviewUrl;
+$('ask-review').addEventListener('click', () => current && pedirAvaliacao(current));
 
 function mensagem() {
   const p = current!;
@@ -531,6 +547,7 @@ function fillForm() {
   renderProducts();
   renderSuggestions();
   const v = current.visualizacoes;
+  $('ask-review').hidden = !current.aceite;
   $('views-info').textContent = current.aceite
     ? `✓ Aceita por ${current.aceite.nome} em ${fmtDate(current.aceite.em)}.`
     : v?.total ? `O cliente abriu esta proposta ${v.total}× (última em ${fmtDate(v.ultima!)}).` : current.status === 'rascunho' ? 'Rascunho: ao enviar, a proposta passa para “Enviada” e o link abre para o cliente.' : 'Enviada. O cliente ainda não abriu o link.';

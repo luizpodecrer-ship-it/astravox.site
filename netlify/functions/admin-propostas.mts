@@ -28,7 +28,7 @@ export default async (req: Request, context: Context) => {
           blobs.map(async (b) => {
             const p = (await db.get(b.key, { type: 'json' })) as Proposta | null;
             if (!p) return null;
-            return { id: p.id, titulo: p.titulo, cliente: p.cliente, status: p.status, atualizadaEm: p.atualizadaEm, criadaEm: p.criadaEm, aceite: p.aceite ?? null, visualizacoes: await views(p.id) };
+            return { id: p.id, titulo: p.titulo, cliente: normalize(p).cliente, produtos: p.produtos ?? [], status: p.status, atualizadaEm: p.atualizadaEm, criadaEm: p.criadaEm, aceite: p.aceite ?? null, visualizacoes: await views(p.id) };
           }),
         );
         return json(items.filter(Boolean).sort((a: any, b: any) => b.atualizadaEm.localeCompare(a.atualizadaEm)));
