@@ -34,6 +34,8 @@ export const SITE = {
     linkedin: '', // TODO
     behance: '', // TODO
     youtube: '', // TODO
+    /** Perfil da Empresa no Google (link de compartilhamento) */
+    google: 'https://share.google/Dt7BLgbKud2z1osu6',
   },
   /** Google Search Console: cole aqui o código da meta tag de verificação */
   googleSiteVerification: '', // TODO
