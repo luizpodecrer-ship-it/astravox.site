@@ -37,6 +37,8 @@ export const SITE = {
     /** Perfil da Empresa no Google (link de compartilhamento) */
     google: 'https://share.google/Dt7BLgbKud2z1osu6',
   },
+  /** Link direto para avaliar a Astravox no Google (Perfil da Empresa → Solicitar avaliações) */
+  reviewUrl: 'https://g.page/r/CR4pJiflNRZjEBM/review',
   /** Google Search Console: cole aqui o código da meta tag de verificação */
   googleSiteVerification: '', // TODO
   /** Google Analytics 4 (ex.: G-XXXXXXX). Só carrega após o consentimento de cookies. */

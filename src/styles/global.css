@@ -514,3 +514,5 @@ ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
 .step--dark .step__n { color: var(--lime); }
 .footer__brand .logo .brand--full { height: 44px; width: auto; }
 .quote__top { color: #e9b200; }
+
+.stars-g { color: #e9b200; letter-spacing: 1px; margin-right: 6px; }

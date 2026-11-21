@@ -25,6 +25,7 @@ const socials = [
           {SITE.email && <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>}
           {hasWhatsapp() && <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>}
           <a href="/contato/"><span class="mono">Formulário</span><span>Fale com a Astravox →</span></a>
+          {SITE.reviewUrl && <a href={SITE.reviewUrl} target="_blank" rel="noopener"><span class="mono">Google</span><span><span class="stars-g" aria-hidden="true">★★★★★</span> Avalie a Astravox</span></a>}
         </div>
       </div>
       <div>

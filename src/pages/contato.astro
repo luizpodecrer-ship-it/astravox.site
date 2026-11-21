@@ -19,6 +19,7 @@ const schema = [{ '@type': 'ContactPage', name: 'Contato — Astravox', url: `${
         <div class="contact-box" style="margin-top:0">
           {hasWhatsapp() && <a href={whatsappLink()} target="_blank" rel="noopener"><span class="mono">WhatsApp</span><span>{SITE.whatsappDisplay}</span></a>}
           {SITE.email && <a href={`mailto:${SITE.email}`}><span class="mono">E-mail</span><span>{SITE.email}</span></a>}
+          {SITE.reviewUrl && <a href={SITE.reviewUrl} target="_blank" rel="noopener"><span class="mono">Google</span><span><span class="stars-g" aria-hidden="true">★★★★★</span> Avalie a Astravox</span></a>}
           {SITE.calendarUrl && <a href={SITE.calendarUrl} target="_blank" rel="noopener"><span class="mono">Agenda</span><span>Marcar uma conversa</span></a>}
         </div>
         <p class="muted" style="margin-top:20px;font-size:14px">{[SITE.address.city, SITE.address.region].filter(Boolean).join(' · ')}{SITE.address.city ? ' — ' : ''}Atendimento remoto para todo o Brasil.</p>
