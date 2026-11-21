@@ -1,0 +1,12 @@
+// Teste no Cloudflare (Workers com arquivos estáticos). Não afeta o site no Netlify.
+// Publica só o site público (pasta dist). O painel de propostas depende do Netlify e não funciona aqui.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "astravox",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

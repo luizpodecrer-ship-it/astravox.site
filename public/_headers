@@ -16,7 +16,9 @@
 /p/*
   X-Robots-Tag: noindex, nofollow
 
-# Cópia de teste no Cloudflare Pages: nunca indexar (evita conteúdo duplicado do astravox.com.br)
+# Cópias de teste no Cloudflare (Workers e Pages): nunca indexar (evita conteúdo duplicado do astravox.com.br)
+https://:worker.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex
 https://:project.pages.dev/*
   X-Robots-Tag: noindex
 https://:version.:project.pages.dev/*
