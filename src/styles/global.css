@@ -516,3 +516,12 @@ ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
 .quote__top { color: #e9b200; }
 
 .stars-g { color: #e9b200; letter-spacing: 1px; margin-right: 6px; }
+
+/* Cartões com telas reais de projetos */
+a.shot { display: block; color: inherit; }
+.shot__img { position: absolute; inset: 52px 18px -12px 18px; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(0,0,0,.25); transition: transform .6s var(--ease); }
+.shot:hover .shot__img { transform: translateY(-8px); }
+.shot__img img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+.shot--dark { background: #0b0b10; border-color: #0b0b10; }
+.shot__img--contain { inset: 44px 10px 6px; background: transparent; border: 0; box-shadow: none; }
+.shot__img--contain img { object-fit: contain; object-position: center; }
